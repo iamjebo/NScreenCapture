@@ -15,7 +15,7 @@ namespace ScreenShot
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CaptureForm());
+            Application.Run(new DemoForm());
         }
     }
 }

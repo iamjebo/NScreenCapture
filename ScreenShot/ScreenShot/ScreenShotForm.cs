@@ -6,10 +6,12 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 
 namespace ScreenShot
 {
-    public partial class CaptureForm : Form
+    public partial class ScreenShotForm : Form
     {
         #region Const
 
@@ -39,9 +41,17 @@ namespace ScreenShot
 
         #endregion
 
+        #region Property
+
+        public string ImageSaveInitialDirectory { get; set; }
+
+        public string ImageSaveFilename { get; set; }
+
+        #endregion
+
         #region Constructor
 
-        public CaptureForm()
+        public ScreenShotForm()
         {
             InitializeComponent();
             Ini();
@@ -75,7 +85,9 @@ namespace ScreenShot
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (m_ShotState == ShotState.CreateRect)    //创建新选区完成，松开鼠标右键进入编辑状态
+                if (m_SelectedRect == Rectangle.Empty)
+                    m_ShotState = ShotState.None;
+                else if (m_ShotState == ShotState.CreateRect)    //创建新选区完成，松开鼠标右键进入编辑状态
                     m_ShotState = ShotState.EditRect;
                 else if (m_ShotState == ShotState.EditRect) //编辑选区时，松开鼠标右键停止编辑选区
                     m_IsStartEditRect = false;
@@ -237,7 +249,7 @@ namespace ScreenShot
             m_EditExRect = Rectangle.Empty;
 
             this.BackgroundImage = GetScreenImgWithMask();
-            this.Cursor = new Cursor(Properties.Resources.cursor_new.Handle);
+            this.Cursor = new Cursor(Properties.Resources.cursor_default.Handle);
             this.Invalidate();
 
         }
@@ -372,15 +384,58 @@ namespace ScreenShot
             }
         }
 
+        private Image GetSelectImage()    //获取选区的截图
+        {
+            Bitmap selectBmp = new Bitmap(m_SelectedRect.Width,
+                                          m_SelectedRect.Height,
+                                          PixelFormat.Format32bppArgb);
+
+            using (Graphics g = Graphics.FromImage(selectBmp))
+            {
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.DrawImage(m_ScreemImg,
+                                      new Rectangle(0, 0, selectBmp.Width, selectBmp.Height),
+                                      m_SelectedRect,
+                                      GraphicsUnit.Pixel);
+            }
+            return selectBmp;
+        }
+
         private void ShowSaveFileDialog()   //保存截图
         {
             using (SaveFileDialog saveDialog = new SaveFileDialog())
             {
-                saveDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                saveDialog.InitialDirectory = ImageSaveInitialDirectory;
+                saveDialog.FileName = ImageSaveFilename;
                 saveDialog.AddExtension = true;
                 saveDialog.DefaultExt = ".jpg";
                 saveDialog.Filter = "JPEG|*.jpg;*.jgeg|BMP|*.bmp|PNG|*.png|GIF|*.gif";
-                saveDialog.ShowDialog();
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ImageFormat format;
+                    switch (saveDialog.FilterIndex)
+                    {
+                        case 1:
+                            format = ImageFormat.Jpeg;
+                            break;
+                        case 2:
+                            format = ImageFormat.Bmp;
+                            break;
+                        case 3:
+                            format = ImageFormat.Png;
+                            break;
+                        case 4:
+                            format = ImageFormat.Gif;
+                            break;
+                        default:
+                            format = ImageFormat.Jpeg;
+                            break;
+                    }
+                    Image selectImg = GetSelectImage();
+                    selectImg.Save(saveDialog.FileName, format);
+                    this.Close();
+                }
             }
         }
 
