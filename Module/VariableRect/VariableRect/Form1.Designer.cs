@@ -1,6 +1,6 @@
-﻿namespace ScreenShot
+﻿namespace VariableRect
 {
-    partial class MainForm
+    partial class Form1
     {
         /// <summary>
         /// 必需的设计器变量。
@@ -28,35 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnStartShot = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // btnStartShot
-            // 
-            this.btnStartShot.Location = new System.Drawing.Point(82, 60);
-            this.btnStartShot.Name = "btnStartShot";
-            this.btnStartShot.Size = new System.Drawing.Size(75, 23);
-            this.btnStartShot.TabIndex = 0;
-            this.btnStartShot.Text = "开始截图";
-            this.btnStartShot.UseVisualStyleBackColor = true;
-            this.btnStartShot.Click += new System.EventHandler(this.btnStartShot_Click);
-            // 
-            // MainForm
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(243, 144);
-            this.Controls.Add(this.btnStartShot);
-            this.Name = "MainForm";
+            this.ClientSize = new System.Drawing.Size(817, 390);
+            this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "截图演示Demo";
+            this.Text = "矩形调整大小Demo";
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Button btnStartShot;
     }
 }
 

@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ScreenShot
+namespace VariableRect
 {
     /// <summary>
-    /// 自定义截图操作状态枚举
+    /// 当前的截图操作状态
     /// </summary>
-    public enum ShotStatus
+    public enum ShotState
     {
         /// <summary>
         /// 无操作
         /// </summary>
-        ssNone,
+        None,
 
         /// <summary>
         /// 创建新选区
         /// </summary>
-        ssCreate,
+        CreateRect,
 
         /// <summary>
         /// 编辑选区
         /// </summary>
-        ssEidting
+        EditRect
     }
 }

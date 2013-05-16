@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace ScreenShot
+namespace VariableRect
 {
     static class Program
     {
@@ -15,7 +15,7 @@ namespace ScreenShot
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CaptureForm());
+            Application.Run(new Form1());
         }
     }
 }

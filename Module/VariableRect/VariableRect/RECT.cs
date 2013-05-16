@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.InteropServices;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
-namespace ScreenShot
+namespace VariableRect
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT
@@ -49,19 +49,16 @@ namespace ScreenShot
 
         public Size Size
         {
-            get
-            {
-                return new Size(Math.Abs(Right - Left),
-                                Math.Abs(Bottom - Top));
-            }
-        }
+            get { return new Size(Math.Abs(Right - Left), 
+                                  Math.Abs(Bottom - Top)); }
+        }        
 
         /// <summary>
         /// 将RECT类型的矩形转换为Rectangle矩形。
         /// </summary>
         public Rectangle ToRectangle()
         {
-            return new Rectangle(Left, Top, Size.Width, Size.Height);
+            return new Rectangle(Left,Top,Size.Width,Size.Height);
         }
     }
 }

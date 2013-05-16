@@ -1,6 +1,6 @@
 ﻿namespace ScreenShot
 {
-    partial class ScreenShotForm
+    partial class CaptureForm
     {
         /// <summary>
         /// Required designer variable.
