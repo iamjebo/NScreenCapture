@@ -114,7 +114,6 @@ namespace ScreenShot
             if (m_ShotState == ShotState.CreateRect)
             {
                 Point endPoint = e.Location;
-                MakeLimitToPoint(ref endPoint);
                 m_SelectedRect = new RECT(m_StartPoint, endPoint).ToRectangle();
                 Invalidate();
             }
@@ -134,6 +133,7 @@ namespace ScreenShot
 
             if (m_SelectedRect != Rectangle.Empty)
             {
+                MakeLimitToSelectRect();
                 Graphics g = e.Graphics;
 
                 //将选区的图片以屏幕原图突出显示出来
@@ -165,19 +165,7 @@ namespace ScreenShot
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-
-            if (e.KeyCode == Keys.Escape)
-            {
-                if (m_ShotState == ShotState.None)
-                    this.Close();
-                else
-                    ClearScrren();
-            }
-            if (e.KeyCode == Keys.Enter)
-            {
-                if (m_ShotState == ShotState.EditRect)
-                    ShowSaveFileDialog();
-            }
+            ProcessKeyDownEnvent(e);
         }
 
         protected override void OnMouseDoubleClick(MouseEventArgs e)
@@ -186,9 +174,6 @@ namespace ScreenShot
 
             if (m_ShotState == ShotState.EditRect && m_SelectedRect.Contains(e.Location))
                 ShowSaveFileDialog();
-            else
-                this.Close();
-
         }
 
         #endregion
@@ -249,7 +234,7 @@ namespace ScreenShot
             m_EditExRect = Rectangle.Empty;
 
             this.BackgroundImage = GetScreenImgWithMask();
-            this.Cursor = new Cursor(Properties.Resources.cursor_default.Handle);
+            //this.Cursor = new Cursor(Properties.Resources.cursor_default.Handle);
             this.Invalidate();
 
         }
@@ -313,22 +298,27 @@ namespace ScreenShot
             return flag;
         }
 
-        private void MakeLimitToPoint(ref Point curPos) //限制选区不能超过窗体边界
+        private void MakeLimitToSelectRect()  //限制选区不能超过窗体边界
         {
-            if (curPos.X < WIDTH_LINE_CUSTOM)
-                curPos.X = WIDTH_LINE_CUSTOM;
-            if (curPos.X > ClientSize.Width - WIDTH_LINE_CUSTOM)
-                curPos.X = ClientSize.Width - WIDTH_LINE_CUSTOM;
-            if (curPos.Y < WIDTH_LINE_CUSTOM)
-                curPos.Y = WIDTH_LINE_CUSTOM;
-            if (curPos.Y > ClientSize.Height - WIDTH_LINE_CUSTOM)
-                curPos.Y = ClientSize.Height - WIDTH_LINE_CUSTOM;
+            if (m_SelectedRect.X < WIDTH_LINE_CUSTOM)
+                m_SelectedRect.X = WIDTH_LINE_CUSTOM;
+            if (m_SelectedRect.Y < WIDTH_LINE_CUSTOM)
+                m_SelectedRect.Y = WIDTH_LINE_CUSTOM;
+            if (m_SelectedRect.Right > ClientSize.Width)
+                m_SelectedRect.X = ClientSize.Width - m_SelectedRect.Width - WIDTH_LINE_CUSTOM;
+            if (m_SelectedRect.Bottom > ClientSize.Height - WIDTH_LINE_CUSTOM)
+                m_SelectedRect.Y = ClientSize.Height - m_SelectedRect.Height - WIDTH_LINE_CUSTOM;
+        }
+
+        private void MoveSelectRect(int x, int y)   //移动选区
+        {
+            m_SelectedRect.Offset(x, y);
+            Invalidate();
         }
 
         private void ResizeSelectRect(int flag, Point curPos)   //调整选区的大小
         {
             RECT rectEx = new RECT(m_EditExRect);
-            MakeLimitToPoint(ref curPos);
 
             switch (flag)   //0-7：调整大小  8：默认  9：移动
             {
@@ -365,21 +355,9 @@ namespace ScreenShot
                 case 8:
                     break;
                 case 9:
-                    m_SelectedRect.Offset(curPos.X - m_StartPoint.X, curPos.Y - m_StartPoint.Y);
-
-                    //边界限制
-                    if (m_SelectedRect.X < WIDTH_LINE_CUSTOM)
-                        m_SelectedRect.X = WIDTH_LINE_CUSTOM;
-                    if (m_SelectedRect.Y < WIDTH_LINE_CUSTOM)
-                        m_SelectedRect.Y = WIDTH_LINE_CUSTOM;
-                    if (m_SelectedRect.Right > ClientSize.Width)
-                        m_SelectedRect.X = ClientSize.Width - m_SelectedRect.Width - WIDTH_LINE_CUSTOM;
-                    if (m_SelectedRect.Bottom > ClientSize.Height - WIDTH_LINE_CUSTOM)
-                        m_SelectedRect.Y = ClientSize.Height - m_SelectedRect.Height - WIDTH_LINE_CUSTOM;
-
+                    MoveSelectRect(curPos.X - m_StartPoint.X, curPos.Y - m_StartPoint.Y);
                     m_StartPoint.X = curPos.X;
                     m_StartPoint.Y = curPos.Y;
-
                     break;
             }
         }
@@ -435,6 +413,89 @@ namespace ScreenShot
                     Image selectImg = GetSelectImage();
                     selectImg.Save(saveDialog.FileName, format);
                     this.Close();
+                }
+            }
+        }
+
+        private void ProcessKeyDownEnvent(KeyEventArgs e)  
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                if (m_ShotState == ShotState.None)
+                    this.Close();
+                else
+                    ClearScrren();
+            }
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (m_ShotState == ShotState.EditRect)
+                    ShowSaveFileDialog();
+            }
+            if (m_SelectedRect != Rectangle.Empty)
+            {
+                if (e.KeyCode == Keys.Up)
+                {
+                    if (e.Modifiers == Keys.Shift)   //Shift + ↑ 向上调整大小
+                    {
+                        //上边界禁止调整大小
+                        if (m_SelectedRect.Y != WIDTH_LINE_CUSTOM)
+                            m_SelectedRect = new Rectangle(m_SelectedRect.X,
+                                                           m_SelectedRect.Y - 1,
+                                                           m_SelectedRect.Width,
+                                                           m_SelectedRect.Height + 1);
+                        Invalidate();
+                    }
+                    else
+                        MoveSelectRect(0, -1);  //向上移动选区
+                }
+
+                if (e.KeyCode == Keys.Down)
+                {
+                    if (e.Modifiers == Keys.Shift)
+                    {
+                        //下边界禁止调整大小
+                        if (m_SelectedRect.Bottom != Height - WIDTH_LINE_CUSTOM)
+                            m_SelectedRect = new Rectangle(m_SelectedRect.X,
+                                                           m_SelectedRect.Y,
+                                                           m_SelectedRect.Width,
+                                                           m_SelectedRect.Height + 1);
+                        Invalidate();
+                    }
+                    else
+                        MoveSelectRect(0, 1);
+                }
+
+                if (e.KeyCode == Keys.Left)
+                {
+                    if (e.Modifiers == Keys.Shift)
+                    {
+                        //左边界禁止调整大小
+                        if (m_SelectedRect.X != WIDTH_LINE_CUSTOM)
+                            m_SelectedRect = new Rectangle(m_SelectedRect.X - 1,
+                                                           m_SelectedRect.Y,
+                                                           m_SelectedRect.Width + 1,
+                                                           m_SelectedRect.Height);
+                        Invalidate();
+                    }
+                    else
+                        MoveSelectRect(-1, 0);
+                }
+
+                if (e.KeyCode == Keys.Right)
+                {
+                    if (e.Modifiers == Keys.Shift)
+                    {
+
+                        //右边界禁止调整大小
+                        if (m_SelectedRect.Right != Width - WIDTH_LINE_CUSTOM)
+                            m_SelectedRect = new Rectangle(m_SelectedRect.X,
+                                                           m_SelectedRect.Y,
+                                                           m_SelectedRect.Width + 1,
+                                                           m_SelectedRect.Height);
+                        Invalidate();
+                    }
+                    else
+                        MoveSelectRect(1, 0);
                 }
             }
         }
