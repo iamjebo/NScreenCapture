@@ -54,15 +54,22 @@
     </Compile>
     <Compile Include="Helpers\MethodHelper.cs" />
     <Compile Include="Helpers\Win32.cs" />
+    <Compile Include="MyControls\GlassButton\GlassButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MyControls\GlassButton\ControlState.cs" />
+    <Compile Include="MyControls\ShotToolBar\ShotToolBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MyTypes\RECT.cs" />
     <Compile Include="MyTypes\ShotState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScreenShotForm.cs">
+    <Compile Include="ScreenShotMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ScreenShotForm.Designer.cs">
-      <DependentUpon>ScreenShotForm.cs</DependentUpon>
+    <Compile Include="ScreenShotMain.Designer.cs">
+      <DependentUpon>ScreenShotMain.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="DemoForm.resx">
       <DependentUpon>DemoForm.cs</DependentUpon>
@@ -77,8 +84,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="ScreenShotForm.resx">
-      <DependentUpon>ScreenShotForm.cs</DependentUpon>
+    <EmbeddedResource Include="ScreenShotMain.resx">
+      <DependentUpon>ScreenShotMain.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -90,9 +97,29 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="MyControls\GlassButton\Res\glassbtn_down.png" />
+    <EmbeddedResource Include="MyControls\GlassButton\Res\glassbtn_hot.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\cursor_default.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Arrow.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Brush.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Ellipse.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Exit.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Rectangle.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Save.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\SinglePoint.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Text.png" />
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\LoadToDrawTool.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MyControls\ShotToolBar\Res\CopyImg.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

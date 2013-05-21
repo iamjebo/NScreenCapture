@@ -11,7 +11,7 @@ using System.Drawing.Drawing2D;
 
 namespace ScreenShot
 {
-    public partial class ScreenShotForm : Form
+    public partial class ScreenShotMain : Form
     {
         #region Const
 
@@ -49,7 +49,6 @@ namespace ScreenShot
         private bool m_IsStartEditRect = false;
         private Rectangle m_EditExRect;                         // 选区编辑之前的大小
 
-
         #endregion
 
         #region Property
@@ -62,7 +61,7 @@ namespace ScreenShot
 
         #region Constructor
 
-        public ScreenShotForm()
+        public ScreenShotMain()
         {
             InitializeComponent();
             Ini();
@@ -99,7 +98,10 @@ namespace ScreenShot
                 if (m_SelectedRect == Rectangle.Empty)
                     m_ShotState = ShotState.None;
                 else if (m_ShotState == ShotState.CreateRect)    //创建新选区完成，松开鼠标右键进入编辑状态
+                {
                     m_ShotState = ShotState.EditRect;
+                    ShowShotToolBar();
+                }
                 else if (m_ShotState == ShotState.EditRect) //编辑选区时，松开鼠标右键停止编辑选区
                     m_IsStartEditRect = false;
             }
@@ -147,6 +149,7 @@ namespace ScreenShot
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
             DrawSelectRect(g);
+            ShowShotToolBar();
             DrawSelectRectInfo(g);
             DrawMouseMoveInfo(g);
         }
@@ -628,6 +631,36 @@ namespace ScreenShot
                     }
 
                 }
+            }
+        }
+
+        private void ShowShotToolBar()
+        {
+            int yoffset = 5;
+            Point location;
+            if (m_SelectedRect.Bottom > Height - yoffset - shotToolBar.Height)
+            {
+                if (m_SelectedRect.Top < shotToolBar.Height + yoffset)
+                    location = new Point(m_SelectedRect.Right - shotToolBar.Width - yoffset, 
+                                         m_SelectedRect.Top + yoffset);
+                else
+                    location = new Point(m_SelectedRect.Right - shotToolBar.Width,
+                                         m_SelectedRect.Top - shotToolBar.Height - yoffset);
+            }
+            else
+                location = new Point(m_SelectedRect.Right - shotToolBar.Width,
+                                     m_SelectedRect.Bottom + yoffset);
+            if (m_SelectedRect.Right < shotToolBar.Width)
+                location = new Point(m_SelectedRect.Left, location.Y);
+
+            if (m_ShotState == ShotState.EditRect)
+            {
+                shotToolBar.Location = location;
+                shotToolBar.Visible = true;
+            }
+            else
+            {
+                shotToolBar.Visible = false;
             }
         }
 

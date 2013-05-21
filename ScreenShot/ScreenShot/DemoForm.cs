@@ -18,7 +18,7 @@ namespace ScreenShot
 
         private void StartCaptureBtn_Click(object sender, EventArgs e)
         {
-            using (ScreenShotForm capture = new ScreenShotForm())
+            using (ScreenShotMain capture = new ScreenShotMain())
             {
                 capture.ImageSaveFilename = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 capture.ImageSaveFilename = "WrySmile.jpg";

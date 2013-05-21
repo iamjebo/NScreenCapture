@@ -1,6 +1,6 @@
 ﻿namespace ScreenShot
 {
-    partial class ScreenShotForm
+    partial class ScreenShotMain
     {
         /// <summary>
         /// Required designer variable.
@@ -28,20 +28,36 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.shotToolBar = new ScreenShot.ShotToolBar();
+            ((System.ComponentModel.ISupportInitialize)(this.shotToolBar)).BeginInit();
             this.SuspendLayout();
             // 
-            // ScreenShotForm
+            // shotToolBar
+            // 
+            this.shotToolBar.Location = new System.Drawing.Point(47, 12);
+            this.shotToolBar.Name = "shotToolBar";
+            this.shotToolBar.Size = new System.Drawing.Size(296, 30);
+            this.shotToolBar.TabIndex = 0;
+            this.shotToolBar.TabStop = false;
+            this.shotToolBar.Visible = false;
+            // 
+            // ScreenShotMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(470, 262);
+            this.Controls.Add(this.shotToolBar);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.KeyPreview = true;
-            this.Name = "ScreenShotForm";
-            this.Text = "ScreenShotForm";
+            this.Name = "ScreenShotMain";
+            this.Text = "ScreenShotMain";
+            ((System.ComponentModel.ISupportInitialize)(this.shotToolBar)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private ShotToolBar shotToolBar;
     }
 }
