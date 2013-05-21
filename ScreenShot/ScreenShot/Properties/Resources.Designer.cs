@@ -59,5 +59,12 @@ namespace ScreenShot.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Icon cursor_default {
+            get {
+                object obj = ResourceManager.GetObject("cursor_default", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

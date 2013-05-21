@@ -15,12 +15,23 @@ namespace ScreenShot
     {
         #region Const
 
-        private const byte ALPHA_SCREEN = 150;                                  //遮罩层背景ALPHA值    
+        private const byte SCREEN_ALPHA_ = 150;                                  //遮罩层背景Alpha值    
 
-        private static readonly Color COLOR_LINE_CUSTOM = Color.Red;            //自定义截图时选区线条颜色
-        private const byte WIDTH_LINE_CUSTOM = 1;                               //自定义截图时选区线条宽度
+        private static readonly Color LINE_COLOR_CUSTOM = Color.Lime;           //自定义截图时选区线条颜色
+        private const byte LINE_WIDTH_CUSTOM = 1;                               //自定义截图时选区线条宽度
+        private const byte LINE_NODE_WIDTH = 3;                                 //自定义截图时选区线条结点宽度
 
-        private const byte WIDTH_NODE = 3;                                      //选区8个调节大小的结点的宽度
+        private const byte INFO_ALPHA = 160;                                    //信息框背景Alpha值
+        private const byte INFO_MOVING_WIDTH = 130;                             //鼠标移动信息框宽度
+        private const byte INFO_MOVING_PIC_HEIGHT = 100;                        //鼠标移动信息框上半部分：放大图像高度
+        private const byte INFO_MOVING_STR_HEIGHT = 40;                         //鼠标移动信息框下半部分：信息字符串高度
+        private const byte INFO_MOVING_RANGE = 10;                              //放大图像的范围
+
+        private const byte INFO_SELECTRECT_WIDTH = 115;                         //选区信息信息框宽度
+        private const byte INFO_SELECTRECT_HEIGHT = 45;                         //选区信息信息框高度
+
+        private static readonly Cursor CURSOR_DEFAULT =
+            new Cursor(Properties.Resources.cursor_default.Handle);
 
         #endregion
 
@@ -31,7 +42,7 @@ namespace ScreenShot
         private ShotState m_ShotState = ShotState.None;
 
         private Point m_StartPoint;
-        private Rectangle m_SelectedRect;
+        private Rectangle m_SelectedRect = Rectangle.Empty;     //选区
 
         private Point[] m_RectNodes = new Point[8];             // 选区8个结点
         private int m_EditFlag = 8;                             // 编辑标记：0-7：调整大小  8：默认  9：移动
@@ -111,55 +122,33 @@ namespace ScreenShot
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
+            base.OnMouseMove(e);
+
             if (m_ShotState == ShotState.CreateRect)
             {
                 Point endPoint = e.Location;
                 m_SelectedRect = new RECT(m_StartPoint, endPoint).ToRectangle();
-                Invalidate();
             }
             else if (m_ShotState == ShotState.EditRect && m_IsStartEditRect == true)
             {
                 ResizeSelectRect(m_EditFlag, e.Location);
-                Invalidate();
             }
 
+            Invalidate();
             SetSelectRectCursor(e.Location);
-            base.OnMouseMove(e);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
-            if (m_SelectedRect != Rectangle.Empty)
-            {
-                MakeLimitToSelectRect();
-                Graphics g = e.Graphics;
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-                //将选区的图片以屏幕原图突出显示出来
-                g.DrawImage(m_ScreemImg, m_SelectedRect, m_SelectedRect, GraphicsUnit.Pixel);
-
-                //画出选区矩形与结点
-                using (Pen redPen = new Pen(COLOR_LINE_CUSTOM, WIDTH_LINE_CUSTOM))
-                {
-                    //绘制选中矩形
-                    e.Graphics.DrawRectangle(redPen, m_SelectedRect);
-
-                    //绘制选中矩形的8个调整大小的节点
-                    m_RectNodes = GetRectNodes(m_SelectedRect);
-                    using (SolidBrush redBrush = new SolidBrush(COLOR_LINE_CUSTOM))
-                    {
-                        foreach (Point node in m_RectNodes)
-                            e.Graphics.FillRectangle(
-                                redBrush,
-                                new Rectangle(
-                                    node.X - WIDTH_NODE,
-                                    node.Y - WIDTH_NODE,
-                                    2 * WIDTH_NODE,
-                                    2 * WIDTH_NODE));
-                    }
-                }
-            }
+            DrawSelectRect(g);
+            DrawSelectRectInfo(g);
+            DrawMouseMoveInfo(g);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -173,7 +162,7 @@ namespace ScreenShot
             base.OnMouseDoubleClick(e);
 
             if (m_ShotState == ShotState.EditRect && m_SelectedRect.Contains(e.Location))
-                ShowSaveFileDialog();
+                SaveSelectRectImage();
         }
 
         #endregion
@@ -185,7 +174,7 @@ namespace ScreenShot
             ScreenShotFormIni();
         }
 
-        private void ScreenShotFormIni()     // 截图窗体属性初始化
+        private void ScreenShotFormIni()
         {
             //双缓冲
             SetStyle(ControlStyles.UserPaint |
@@ -200,6 +189,7 @@ namespace ScreenShot
 
             m_ScreemImg = GetScreenImg();
             this.BackgroundImage = GetScreenImgWithMask();
+            this.Cursor = CURSOR_DEFAULT;
         }
 
         private Image GetScreenImg()    //获取原始屏幕截图
@@ -218,7 +208,7 @@ namespace ScreenShot
             Image sceenMaskImg = new Bitmap(m_ScreemImg);
             using (Graphics g = Graphics.FromImage(sceenMaskImg))
             {
-                using (SolidBrush maskBrush = new SolidBrush(Color.FromArgb(ALPHA_SCREEN, 0, 0, 0)))
+                using (SolidBrush maskBrush = new SolidBrush(Color.FromArgb(SCREEN_ALPHA_, 0, 0, 0)))
                 {
                     g.FillRectangle(maskBrush, 0, 0, sceenMaskImg.Width, sceenMaskImg.Height);
                     return sceenMaskImg;
@@ -234,12 +224,10 @@ namespace ScreenShot
             m_EditExRect = Rectangle.Empty;
 
             this.BackgroundImage = GetScreenImgWithMask();
-            //this.Cursor = new Cursor(Properties.Resources.cursor_default.Handle);
             this.Invalidate();
-
         }
 
-        private Point[] GetRectNodes(Rectangle rect) //获取选区的8个调整大小的结点
+        private Point[] GetRectNodes(Rectangle rect)
         {
             Point[] nodes = new Point[8];
             nodes[0] = rect.Location;
@@ -253,7 +241,7 @@ namespace ScreenShot
             return nodes;
         }
 
-        private int SetSelectRectCursor(Point mousePt)   //设置选区调整大小的光标
+        private int SetSelectRectCursor(Point mousePt)
         {
             Cursor[] RectCursors = { Cursors.SizeNWSE,    // 西北
                                      Cursors.SizeWE,      // 西
@@ -263,7 +251,7 @@ namespace ScreenShot
                                      Cursors.SizeWE,      // 东
                                      Cursors.SizeNESW,    // 东北
                                      Cursors.SizeNS,      // 北
-                                     Cursors.Default,     // 默认
+                                     CURSOR_DEFAULT,      // 默认
                                      Cursors.SizeAll};    // 移动
             //初始化
             int flag = 8;
@@ -282,10 +270,10 @@ namespace ScreenShot
 
             for (int i = 0; i < m_RectNodes.Length; i++)
             {
-                Rectangle nodeRect = new Rectangle(m_RectNodes[i].X - WIDTH_NODE,
-                                                   m_RectNodes[i].Y - WIDTH_NODE,
-                                                   2 * WIDTH_NODE,
-                                                   2 * WIDTH_NODE);
+                Rectangle nodeRect = new Rectangle(m_RectNodes[i].X - LINE_NODE_WIDTH,
+                                                   m_RectNodes[i].Y - LINE_NODE_WIDTH,
+                                                   2 * LINE_NODE_WIDTH,
+                                                   2 * LINE_NODE_WIDTH);
                 if (nodeRect.Contains(mousePt))
                 {
                     flag = i;
@@ -300,23 +288,23 @@ namespace ScreenShot
 
         private void MakeLimitToSelectRect()  //限制选区不能超过窗体边界
         {
-            if (m_SelectedRect.X < WIDTH_LINE_CUSTOM)
-                m_SelectedRect.X = WIDTH_LINE_CUSTOM;
-            if (m_SelectedRect.Y < WIDTH_LINE_CUSTOM)
-                m_SelectedRect.Y = WIDTH_LINE_CUSTOM;
+            if (m_SelectedRect.X < 0)
+                m_SelectedRect.X = 0;
+            if (m_SelectedRect.Y < 0)
+                m_SelectedRect.Y = 0;
             if (m_SelectedRect.Right > ClientSize.Width)
-                m_SelectedRect.X = ClientSize.Width - m_SelectedRect.Width - WIDTH_LINE_CUSTOM;
-            if (m_SelectedRect.Bottom > ClientSize.Height - WIDTH_LINE_CUSTOM)
-                m_SelectedRect.Y = ClientSize.Height - m_SelectedRect.Height - WIDTH_LINE_CUSTOM;
+                m_SelectedRect.X = ClientSize.Width - m_SelectedRect.Width;
+            if (m_SelectedRect.Bottom > ClientSize.Height)
+                m_SelectedRect.Y = ClientSize.Height - m_SelectedRect.Height;
         }
 
-        private void MoveSelectRect(int x, int y)   //移动选区
+        private void MoveSelectRect(int x, int y)
         {
             m_SelectedRect.Offset(x, y);
             Invalidate();
         }
 
-        private void ResizeSelectRect(int flag, Point curPos)   //调整选区的大小
+        private void ResizeSelectRect(int flag, Point curPos)
         {
             RECT rectEx = new RECT(m_EditExRect);
 
@@ -362,7 +350,7 @@ namespace ScreenShot
             }
         }
 
-        private Image GetSelectImage()    //获取选区的截图
+        private Image GetSelectRectImage()
         {
             Bitmap selectBmp = new Bitmap(m_SelectedRect.Width,
                                           m_SelectedRect.Height,
@@ -380,7 +368,7 @@ namespace ScreenShot
             return selectBmp;
         }
 
-        private void ShowSaveFileDialog()   //保存截图
+        private void SaveSelectRectImage()
         {
             using (SaveFileDialog saveDialog = new SaveFileDialog())
             {
@@ -410,14 +398,14 @@ namespace ScreenShot
                             format = ImageFormat.Jpeg;
                             break;
                     }
-                    Image selectImg = GetSelectImage();
+                    Image selectImg = GetSelectRectImage();
                     selectImg.Save(saveDialog.FileName, format);
                     this.Close();
                 }
             }
         }
 
-        private void ProcessKeyDownEnvent(KeyEventArgs e)  
+        private void ProcessKeyDownEnvent(KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
             {
@@ -429,7 +417,7 @@ namespace ScreenShot
             if (e.KeyCode == Keys.Enter)
             {
                 if (m_ShotState == ShotState.EditRect)
-                    ShowSaveFileDialog();
+                    SaveSelectRectImage();
             }
             if (m_SelectedRect != Rectangle.Empty)
             {
@@ -438,7 +426,7 @@ namespace ScreenShot
                     if (e.Modifiers == Keys.Shift)   //Shift + ↑ 向上调整大小
                     {
                         //上边界禁止调整大小
-                        if (m_SelectedRect.Y != WIDTH_LINE_CUSTOM)
+                        if (m_SelectedRect.Y != 0)
                             m_SelectedRect = new Rectangle(m_SelectedRect.X,
                                                            m_SelectedRect.Y - 1,
                                                            m_SelectedRect.Width,
@@ -454,7 +442,7 @@ namespace ScreenShot
                     if (e.Modifiers == Keys.Shift)
                     {
                         //下边界禁止调整大小
-                        if (m_SelectedRect.Bottom != Height - WIDTH_LINE_CUSTOM)
+                        if (m_SelectedRect.Bottom != Height)
                             m_SelectedRect = new Rectangle(m_SelectedRect.X,
                                                            m_SelectedRect.Y,
                                                            m_SelectedRect.Width,
@@ -470,7 +458,7 @@ namespace ScreenShot
                     if (e.Modifiers == Keys.Shift)
                     {
                         //左边界禁止调整大小
-                        if (m_SelectedRect.X != WIDTH_LINE_CUSTOM)
+                        if (m_SelectedRect.X != 0)
                             m_SelectedRect = new Rectangle(m_SelectedRect.X - 1,
                                                            m_SelectedRect.Y,
                                                            m_SelectedRect.Width + 1,
@@ -487,7 +475,7 @@ namespace ScreenShot
                     {
 
                         //右边界禁止调整大小
-                        if (m_SelectedRect.Right != Width - WIDTH_LINE_CUSTOM)
+                        if (m_SelectedRect.Right != Width)
                             m_SelectedRect = new Rectangle(m_SelectedRect.X,
                                                            m_SelectedRect.Y,
                                                            m_SelectedRect.Width + 1,
@@ -496,6 +484,149 @@ namespace ScreenShot
                     }
                     else
                         MoveSelectRect(1, 0);
+                }
+            }
+        }
+
+        private void DrawSelectRect(Graphics g)
+        {
+            if (m_SelectedRect != Rectangle.Empty)
+            {
+                MakeLimitToSelectRect();
+
+                //将选区的图片以屏幕原图突出显示出来
+                g.DrawImage(m_ScreemImg, m_SelectedRect, m_SelectedRect, GraphicsUnit.Pixel);
+
+                //绘制选区矩形与结点
+                using (Pen redPen = new Pen(LINE_COLOR_CUSTOM, LINE_WIDTH_CUSTOM))
+                {
+                    //绘制选中矩形
+                    g.DrawRectangle(redPen, m_SelectedRect);
+
+                    //绘制选中矩形的8个调整大小的节点
+                    m_RectNodes = GetRectNodes(m_SelectedRect);
+                    using (SolidBrush redBrush = new SolidBrush(LINE_COLOR_CUSTOM))
+                    {
+                        foreach (Point node in m_RectNodes)
+                            g.FillRectangle(
+                                redBrush,
+                                new Rectangle(
+                                    node.X - LINE_NODE_WIDTH,
+                                    node.Y - LINE_NODE_WIDTH,
+                                    2 * LINE_NODE_WIDTH,
+                                    2 * LINE_NODE_WIDTH));
+                    }
+                }
+            }
+        }
+
+        private void DrawSelectRectInfo(Graphics g)
+        {
+            if (m_SelectedRect != Rectangle.Empty)
+            {
+                Rectangle infoRect = new Rectangle();
+                infoRect.Width = INFO_SELECTRECT_WIDTH;
+                infoRect.Height = INFO_SELECTRECT_HEIGHT;
+                int offset = 3;
+                infoRect.X = m_SelectedRect.X + offset;
+
+                //上边界检查
+                if (m_SelectedRect.Y < INFO_SELECTRECT_HEIGHT + LINE_WIDTH_CUSTOM)
+                    infoRect.Y = m_SelectedRect.Y + offset;
+                else
+                    infoRect.Y = m_SelectedRect.Y - INFO_SELECTRECT_HEIGHT - offset;
+
+                //绘制alpha 背景
+                using (SolidBrush sbrush = new SolidBrush(Color.FromArgb(INFO_ALPHA, 0, 0, 0)))
+                {
+                    g.FillRectangle(sbrush, infoRect);
+                    sbrush.Color = Color.White;
+                    string infoStr = string.Format("大小：{0} x {1} \n双击可保存图像",
+                                                    m_SelectedRect.Width,
+                                                    m_SelectedRect.Height);
+
+                    using (Font fontStr = new Font("微软雅黑", 9))
+                    {
+                        g.DrawString(infoStr, fontStr, sbrush, new Point(infoRect.X + 5, infoRect.Y + 5));
+                    }
+
+                }
+            }
+        }
+
+        private void DrawMouseMoveInfo(Graphics g)
+        {
+            if (m_ShotState != ShotState.EditRect)
+            {
+                Rectangle infoRect = new Rectangle();
+                infoRect.Width = INFO_MOVING_WIDTH;
+                infoRect.Height = INFO_MOVING_PIC_HEIGHT + INFO_MOVING_STR_HEIGHT;
+                int xoffset = 10;
+                int yoffset = 30;
+                infoRect.X = Control.MousePosition.X + xoffset;
+                infoRect.Y = Control.MousePosition.Y + yoffset;
+
+                //边界检查限制
+                if (Control.MousePosition.X > Width - infoRect.Width - xoffset)
+                    infoRect.X = Control.MousePosition.X - infoRect.Width - xoffset;
+                if (Control.MousePosition.Y > Height - infoRect.Height - yoffset)
+                    infoRect.Y = Control.MousePosition.Y - infoRect.Height - yoffset;
+
+                Rectangle picRect = new Rectangle(infoRect.X,
+                    infoRect.Y,
+                    INFO_MOVING_WIDTH,
+                    INFO_MOVING_PIC_HEIGHT);
+                Rectangle rangeRect = new Rectangle(Control.MousePosition.X - INFO_MOVING_RANGE,
+                    Control.MousePosition.Y - INFO_MOVING_RANGE,
+                    2 * INFO_MOVING_RANGE,
+                    2 * INFO_MOVING_RANGE);
+
+                using (Pen picPen = new Pen(Color.Black, 1))
+                {
+                    //放大图
+                    g.DrawImage(m_ScreemImg, picRect, rangeRect, GraphicsUnit.Pixel);
+
+                    //内外边框
+                    g.DrawRectangle(picPen, picRect);
+                    picPen.Color = Color.White;
+                    picRect.Inflate(-1, -1);
+                    g.DrawRectangle(picPen, picRect);
+
+                    //十字架
+                    picPen.Color = LINE_COLOR_CUSTOM;
+                    picPen.Width = 4;
+                    g.DrawLine(picPen,
+                               new Point(picRect.X + picRect.Width / 2, picRect.Y + 2),
+                               new Point(picRect.X + picRect.Width / 2, picRect.Bottom - 2));
+                    g.DrawLine(picPen,
+                               new Point(picRect.X + 2, picRect.Y + picRect.Height / 2),
+                               new Point(picRect.Right - 2, picRect.Y + picRect.Height / 2));
+                }
+
+                Rectangle strRect = new Rectangle(infoRect.X,
+                    infoRect.Y + INFO_MOVING_PIC_HEIGHT,
+                    INFO_MOVING_WIDTH,
+                    INFO_MOVING_STR_HEIGHT);
+
+                Color currentColor = MethodHelper.GetColor(m_ScreemImg, Control.MousePosition.X, Control.MousePosition.Y);
+                string infoStr = string.Format("大小：{0} x {1} \nRGB：({2},{3},{4})",
+                                                    m_SelectedRect.Width,
+                                                    m_SelectedRect.Height,
+                                                    currentColor.R,
+                                                    currentColor.G,
+                                                    currentColor.B);
+
+                //绘制字符串
+                using (SolidBrush sbrush = new SolidBrush(Color.FromArgb(INFO_ALPHA, 0, 0, 0)))
+                {
+                    g.FillRectangle(sbrush, strRect);
+                    sbrush.Color = Color.White;
+
+                    using (Font fontStr = new Font("微软雅黑", 9))
+                    {
+                        g.DrawString(infoStr, fontStr, sbrush, new Point(strRect.X + 5, strRect.Y + 5));
+                    }
+
                 }
             }
         }
