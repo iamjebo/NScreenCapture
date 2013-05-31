@@ -14,8 +14,21 @@ namespace ScreenShot
     /// </summary>
     public partial class ShotToolBar : PictureBox
     {
+        #region Field
+
         private static readonly Color TOOLBAR_BORDER_COLOR = Color.FromArgb(200, 78, 153, 210);
         private static readonly Color TOOLBAR_BACKGROUND_COLOR = Color.FromArgb(200, 222, 238, 255);
+
+        private object EventObject_Rect = new object();
+        private object EventObject_Ellipse = new object();
+        private object EventObject_Arrow = new object();
+        private object EventObject_Brush = new object();
+        private object EventObject_Text = new object();
+        private object EventObject_Undo = new object();
+        private object EventObject_Save = new object();
+        private object EventObject_LoadImgToMSpaint = new object();
+        private object EventObject_CopyImg = new object();
+        private object EventObject_Exit = new object();
 
         private GlassButton rectTool;
         private GlassButton ellipseTool;
@@ -24,20 +37,135 @@ namespace ScreenShot
         private GlassButton textTool;
         private GlassButton undoTool;
         private GlassButton saveTool;
-        private GlassButton loadToDrawTool;
+        private GlassButton loadImgToMSpaintTool;
         private GlassButton copyImgTool;
         private GlassButton exitShotTool;
+
+        #endregion
+
+        #region Constructor
 
         public ShotToolBar()
         {
             ShotToolBarIni();
         }
 
+        #endregion
+
+        #region Event
+
+        public event EventHandler RectToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Rect, value); }
+            remove { base.Events.RemoveHandler(EventObject_Rect, value); }
+        }
+
+        public event EventHandler EllipseToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Ellipse, value); }
+            remove { base.Events.RemoveHandler(EventObject_Ellipse, value); }
+        }
+
+        public event EventHandler ArrowToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Arrow, value); }
+            remove { base.Events.RemoveHandler(EventObject_Arrow, value); }
+        }
+
+        public event EventHandler BrushToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Brush, value); }
+            remove { base.Events.RemoveHandler(EventObject_Brush, value); }
+        }
+
+        public event EventHandler TextToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Text, value); }
+            remove { base.Events.RemoveHandler(EventObject_Text, value); }
+        }
+
+        public event EventHandler UndoToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Undo, value); }
+            remove { base.Events.RemoveHandler(EventObject_Undo, value); }
+        }
+
+        public event EventHandler SaveToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Save, value); }
+            remove { base.Events.RemoveHandler(EventObject_Save, value); }
+        }
+
+        public event EventHandler LoadImgToMSpaintToolClick
+        {
+            add { base.Events.AddHandler(EventObject_LoadImgToMSpaint, value); }
+            remove { base.Events.RemoveHandler(EventObject_LoadImgToMSpaint, value); }
+        }
+
+        public event EventHandler CopyImgToolClick
+        {
+            add { base.Events.AddHandler(EventObject_CopyImg, value); }
+            remove { base.Events.RemoveHandler(EventObject_CopyImg, value); }
+        }
+
+        public event EventHandler ExitToolClick
+        {
+            add { base.Events.AddHandler(EventObject_Exit, value); }
+            remove { base.Events.RemoveHandler(EventObject_Exit, value); }
+        }
+
+        #endregion
+
+        #region Override
+
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            base.OnMouseEnter(e);
+            this.Cursor = Cursors.Default;
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            using (Pen pen = new Pen(TOOLBAR_BORDER_COLOR))
+            {
+                using (SolidBrush sbrush = new SolidBrush(TOOLBAR_BACKGROUND_COLOR))
+                {
+                    e.Graphics.FillRectangle(sbrush, ClientRectangle);
+                    e.Graphics.DrawRectangle(pen,
+                        new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1));
+                }
+            }
+        }
+
+        protected override CreateParams CreateParams
+        {//解决工具栏因子控件太多重绘时严重闪烁问题。
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                if (!DesignMode)
+                {
+                    cp.ExStyle |= Win32.WS_CLIPCHILDREN;
+                }
+                return cp;
+            }
+        }
+
+        #endregion
+
+        #region Private
+
         private void ShotToolBarIni()
+        {
+            ToolsIni();
+            ToolsEventIni();
+        }
+
+        private void ToolsIni()
         {
             this.exitShotTool = new ScreenShot.GlassButton();
             this.copyImgTool = new ScreenShot.GlassButton();
-            this.loadToDrawTool = new ScreenShot.GlassButton();
+            this.loadImgToMSpaintTool = new ScreenShot.GlassButton();
             this.saveTool = new ScreenShot.GlassButton();
             this.undoTool = new ScreenShot.GlassButton();
             this.textTool = new ScreenShot.GlassButton();
@@ -77,16 +205,16 @@ namespace ScreenShot
             // 
             // loadToDrawTool
             // 
-            this.loadToDrawTool.BackColor = System.Drawing.Color.Transparent;
-            this.loadToDrawTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.loadToDrawTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.loadToDrawTool.Location = new System.Drawing.Point(208, 3);
-            this.loadToDrawTool.Name = "loadToDrawTool";
-            this.loadToDrawTool.Size = new System.Drawing.Size(24, 24);
-            this.loadToDrawTool.TabIndex = 7;
-            this.loadToDrawTool.TabStop = false;
-            this.loadToDrawTool.ToolTipText = "导入画图工具中编辑";
-            this.loadToDrawTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.LoadToDrawTool.png");
+            this.loadImgToMSpaintTool.BackColor = System.Drawing.Color.Transparent;
+            this.loadImgToMSpaintTool.DialogResult = System.Windows.Forms.DialogResult.None;
+            this.loadImgToMSpaintTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.loadImgToMSpaintTool.Location = new System.Drawing.Point(208, 3);
+            this.loadImgToMSpaintTool.Name = "loadToDrawTool";
+            this.loadImgToMSpaintTool.Size = new System.Drawing.Size(24, 24);
+            this.loadImgToMSpaintTool.TabIndex = 7;
+            this.loadImgToMSpaintTool.TabStop = false;
+            this.loadImgToMSpaintTool.ToolTipText = "导入画图工具中编辑";
+            this.loadImgToMSpaintTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.LoadToDrawTool.png");
             // 
             // saveTool
             // 
@@ -184,7 +312,7 @@ namespace ScreenShot
             this.ClientSize = new System.Drawing.Size(296, 30);
             this.Controls.Add(this.exitShotTool);
             this.Controls.Add(this.copyImgTool);
-            this.Controls.Add(this.loadToDrawTool);
+            this.Controls.Add(this.loadImgToMSpaintTool);
             this.Controls.Add(this.saveTool);
             this.Controls.Add(this.undoTool);
             this.Controls.Add(this.textTool);
@@ -197,17 +325,117 @@ namespace ScreenShot
             this.ResumeLayout(false);
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        private void ToolsEventIni()
         {
-            base.OnPaint(e);
-            using (Pen pen = new Pen(TOOLBAR_BORDER_COLOR))
-            {
-                using (SolidBrush sbrush = new SolidBrush(TOOLBAR_BACKGROUND_COLOR))
-                {
-                    e.Graphics.FillRectangle(sbrush, ClientRectangle);
-                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1));
-                }
-            }
+            rectTool.Click += new EventHandler(OnRectToolClick);
+            ellipseTool.Click += new EventHandler(OnEllipseToolClick);
+            arrowTool.Click += new EventHandler(OnArrowToolClick);
+            brushTool.Click += new EventHandler(OnBrushToolClick);
+            textTool.Click += new EventHandler(OnTextToolClick);
+            undoTool.Click += new EventHandler(OnUndoToolClick);
+            saveTool.Click += new EventHandler(OnSaveToolClick);
+            loadImgToMSpaintTool.Click += new EventHandler(OnLoadImgToMSpaintToolClick);
+            copyImgTool.Click += new EventHandler(OnCopyImgToolClick);
+            exitShotTool.Click += new EventHandler(OnExitToolClick);
         }
+
+        private void OnRectToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Rect] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnEllipseToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Ellipse] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnArrowToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Arrow] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnBrushToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Brush] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnTextToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Text] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnUndoToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Undo] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnSaveToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Save] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnLoadImgToMSpaintToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_LoadImgToMSpaint] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        private void OnCopyImgToolClick(object sender, EventArgs e)
+        {
+            EventHandler hander = base.Events[EventObject_CopyImg] as EventHandler;
+            if (hander != null)
+                hander(this, e);
+        }
+
+        private void OnExitToolClick(object sender, EventArgs e)
+        {
+            EventHandler handler = base.Events[EventObject_Exit] as EventHandler;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        #endregion
+
+        #region Hiding
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new ImageLayout BackgroundImageLayout { get { return base.BackgroundImageLayout; } set { base.BackgroundImageLayout = value; } }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new Image BackgroundImage { get { return base.BackgroundImage; } set { base.BackgroundImage = value; } }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new String ImageLocation { get { return base.ImageLocation; } set { base.ImageLocation = value; } }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new Image ErrorImage { get { return base.ErrorImage; } set { base.ErrorImage = value; } }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new Image InitialImage { get { return base.InitialImage; } set { base.InitialImage = value; } }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new bool WaitOnLoad { get { return base.WaitOnLoad; } set { base.WaitOnLoad = value; } }
+        #endregion
     }
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScreenShot", "ScreenShot\ScreenShot.csproj", "{59F4B4AC-562F-4C22-AE7F-25F6CB688432}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NScreenShot", "ScreenShot\NScreenShot.csproj", "{59F4B4AC-562F-4C22-AE7F-25F6CB688432}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

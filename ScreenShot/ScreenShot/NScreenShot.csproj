@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\NScreenShot.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,18 +49,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DemoForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DemoForm.Designer.cs">
-      <DependentUpon>DemoForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Helpers\MethodHelper.cs" />
     <Compile Include="Helpers\Win32.cs" />
+    <Compile Include="MyControls\ColorButton\ColorButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MyControls\ColorTable\ColorTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MyControls\GlassButton\GlassButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MyControls\GlassButton\ControlState.cs" />
+    <Compile Include="MyTypes\ControlState.cs" />
     <Compile Include="MyControls\ShotToolBar\ShotToolBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -68,12 +71,6 @@
     <Compile Include="ScreenShotMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ScreenShotMain.Designer.cs">
-      <DependentUpon>ScreenShotMain.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="DemoForm.resx">
-      <DependentUpon>DemoForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -120,6 +117,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MyControls\ShotToolBar\Res\CopyImg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\NScreenShot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

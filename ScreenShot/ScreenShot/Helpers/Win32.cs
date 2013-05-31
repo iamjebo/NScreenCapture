@@ -16,6 +16,8 @@ namespace ScreenShot
 
         public const int HTCAPTION = 2;
 
+        public const int WS_CLIPCHILDREN = 0x02000000;
+
         [DllImport("gdi32.dll")]
         public static extern int CreateRoundRectRgn(int x1, int y1, int x2, int y2, int x3, int y3);
 

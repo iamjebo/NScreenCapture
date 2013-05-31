@@ -15,7 +15,12 @@ namespace ScreenShot
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DemoForm());
+
+            ScreenShotMain capture = new ScreenShotMain();
+            capture.ImageSaveFilename = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            capture.ImageSaveFilename = "WrySmile.jpg";
+
+            Application.Run(capture);
         }
     }
 }
