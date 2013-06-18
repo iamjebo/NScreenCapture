@@ -9,6 +9,16 @@ using System.Windows.Forms;
 
 namespace ScreenShot
 {
+
+    /****************************************************************
+    * 
+    *             Dcrp：静态方法帮助类，封装了常用的方法。
+    *           Author：曹江波
+    *             Blog: http://www.cnblogs.com/Keep-Silence-/
+    *             Date: 2013-5-18
+    *
+    *****************************************************************/
+
     public class MethodHelper
     {
         /// <summary>

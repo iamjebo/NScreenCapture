@@ -5,40 +5,31 @@ using System.Text;
 
 namespace ScreenShot
 {
+
     /****************************************************************
     * 
-    *             Dcrp：当前的截图操作状态，方便控制操作流程。
+    *             Dcrp：宽度点控件内圆点的宽度大小枚举
     *           Author：曹江波
     *             Blog: http://www.cnblogs.com/Keep-Silence-/
-    *           Update: 2013-5-31
+    *           Update: 2013-6-12
     *
     *****************************************************************/
 
-    public enum ShotState
+    public enum DotWidth
     {
         /// <summary>
-        /// 无操作
+        /// 最小的宽度
         /// </summary>
-        None,
+        Minimize,
 
         /// <summary>
-        /// 正在创建新选区
+        /// 中等的宽度
         /// </summary>
-        CreatingRect,
+        Medium,
 
         /// <summary>
-        /// 选区创建完成
+        /// 最大的宽度
         /// </summary>
-        FinishedRect,
-
-        /// <summary>
-        /// 调整选区的大小
-        /// </summary>
-        ResizingRect,
-
-        /// <summary>
-        /// 在选区内绘制图形
-        /// </summary>
-        DrawInRect
+        Maximize
     }
 }

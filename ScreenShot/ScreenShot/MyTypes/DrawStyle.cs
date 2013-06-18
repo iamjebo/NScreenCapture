@@ -7,38 +7,43 @@ namespace ScreenShot
 {
     /****************************************************************
     * 
-    *             Dcrp：当前的截图操作状态，方便控制操作流程。
+    *             Dcrp：ShotToolBar 绘图类型枚举
     *           Author：曹江波
     *             Blog: http://www.cnblogs.com/Keep-Silence-/
-    *           Update: 2013-5-31
+    *           Update: 2013-6-12
     *
     *****************************************************************/
 
-    public enum ShotState
+    public enum DrawStyle
     {
         /// <summary>
-        /// 无操作
+        /// 无任何绘制
         /// </summary>
         None,
 
         /// <summary>
-        /// 正在创建新选区
+        /// 绘制矩形
         /// </summary>
-        CreatingRect,
+        DrawRectangle,
 
         /// <summary>
-        /// 选区创建完成
+        /// 绘制椭圆
         /// </summary>
-        FinishedRect,
+        DrawEllipse,
 
         /// <summary>
-        /// 调整选区的大小
+        /// 绘制箭头
         /// </summary>
-        ResizingRect,
+        DrawArrow,
 
         /// <summary>
-        /// 在选区内绘制图形
+        /// 绘制画刷
         /// </summary>
-        DrawInRect
+        DrawBrush,
+
+        /// <summary>
+        /// 绘制文字
+        /// </summary>
+        DrawText
     }
 }

@@ -5,7 +5,17 @@ using System.Text;
 
 namespace ScreenShot
 {
-    public enum ControlState
+
+    /****************************************************************
+    * 
+    *             Dcrp：自定义控件的状态枚举
+    *           Author：曹江波
+    *             Blog: http://www.cnblogs.com/Keep-Silence-/
+    *           Update: 2013-5-31
+    *
+    *****************************************************************/
+
+    public enum MyControlState
     {
         /// <summary>
         /// 正常状态

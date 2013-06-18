@@ -7,6 +7,15 @@ using System.Drawing;
 
 namespace ScreenShot
 {
+    /****************************************************************
+    * 
+    *             Dcrp：以2点构造一个矩形，属于Win32 平台的数据结构。
+    *           Author：曹江波
+    *             Blog: http://www.cnblogs.com/Keep-Silence-/
+    *           Update: 2013-5-31
+    *
+    *****************************************************************/
+
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT
     {

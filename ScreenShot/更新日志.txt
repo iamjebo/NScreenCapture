@@ -1,3 +1,10 @@
-V0.6:
+V0.62:
 
-添加：颜色选择控件 ColorTable 。
+更改：修改GlassButton 实现单选框的效果。
+更改：使用修改后的GlassButton重新构造工具栏。
+更改：使用窗体设计器重新设计主窗体
+
+添加：ColorTable边框属性
+添加：ColorTableWithWidth控件到主窗体
+添加：ColorTableWithFont控件到主窗体
+添加：注册到主窗体的ShotToolBar事件

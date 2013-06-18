@@ -51,8 +51,29 @@
   <ItemGroup>
     <Compile Include="Helpers\MethodHelper.cs" />
     <Compile Include="Helpers\Win32.cs" />
+    <Compile Include="Main\ScreenShot_ToolBarEventHandler.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\ScreenShotForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\ScreenShotForm.Designer.cs">
+      <DependentUpon>ScreenShotForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MyControls\ColorButton\ColorButton.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MyControls\ColorTableWithFont\ColorTableWithFont.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MyControls\ColorTableWithFont\ColorTableWithFont.Designer.cs">
+      <DependentUpon>ColorTableWithFont.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MyControls\ColorTableWithWidth\ColorTableWithWidth.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MyControls\ColorTableWithWidth\ColorTableWithWidth.Designer.cs">
+      <DependentUpon>ColorTableWithWidth.cs</DependentUpon>
     </Compile>
     <Compile Include="MyControls\ColorTable\ColorTable.cs">
       <SubType>Component</SubType>
@@ -60,17 +81,29 @@
     <Compile Include="MyControls\GlassButton\GlassButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MyTypes\ControlState.cs" />
+    <Compile Include="MyControls\WidthDotButton\WidthDotButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MyTypes\MyControlState.cs" />
     <Compile Include="MyControls\ShotToolBar\ShotToolBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="MyTypes\DotWidth.cs" />
+    <Compile Include="MyTypes\DrawStyle.cs" />
+    <Compile Include="MyTypes\MyControlColors.cs" />
     <Compile Include="MyTypes\RECT.cs" />
     <Compile Include="MyTypes\ShotState.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Main\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScreenShotMain.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <EmbeddedResource Include="Main\ScreenShotForm.resx">
+      <DependentUpon>ScreenShotForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MyControls\ColorTableWithFont\ColorTableWithFont.resx">
+      <DependentUpon>ColorTableWithFont.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MyControls\ColorTableWithWidth\ColorTableWithWidth.resx">
+      <DependentUpon>ColorTableWithWidth.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -81,9 +114,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="ScreenShotMain.resx">
-      <DependentUpon>ScreenShotMain.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -119,8 +149,12 @@
     <EmbeddedResource Include="MyControls\ShotToolBar\Res\CopyImg.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="MyControls\WidthDotButton\Res\dot.png" />
+    <EmbeddedResource Include="MyControls\WidthDotButton\Res\glassbtn_down.png" />
+    <EmbeddedResource Include="MyControls\WidthDotButton\Res\glassbtn_hot.png" />
     <Content Include="Resources\NScreenShot.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

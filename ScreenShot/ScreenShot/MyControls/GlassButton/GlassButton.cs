@@ -11,21 +11,21 @@ namespace ScreenShot
 
     /****************************************************************
     * 
-    *           Author：苦笑(wrysmile)
+    *             Dcrp：玻璃按钮，用以构造截图工具栏控件(ShotToolBar)
+    *           Author：曹江波
     *             Blog: http://www.cnblogs.com/Keep-Silence-/
     *             Date: 2013-5-22
     *
     *****************************************************************/
 
-    public class GlassButton : PictureBox, IButtonControl
+    public class GlassButton : RadioButton
     {
         #region  Fileds
 
-        private DialogResult m_DialogResult;
-        private bool m_isDefault = false;
         private bool m_holdingSpace = false;
 
-        private ControlState m_state = ControlState.Normal;
+        private bool m_isDown = false;
+        private MyControlState m_state = MyControlState.Normal;
         private Font m_defaultFont;
 
         private Image m_glassHotImg;
@@ -46,45 +46,14 @@ namespace ScreenShot
 
             this.BackColor = Color.Transparent;
             this.Size = new Size(75, 23);
-            this.BorderStyle = BorderStyle.None;
             this.Font = m_defaultFont;
         }
 
         #endregion
 
-        #region IButtonControl Members
-
-        public DialogResult DialogResult
-        {
-            get
-            {
-                return m_DialogResult;
-            }
-            set
-            {
-                if (Enum.IsDefined(typeof(DialogResult), value))
-                {
-                    m_DialogResult = value;
-                }
-            }
-        }
-
-        public void NotifyDefault(bool value)
-        {
-            if (m_isDefault != value)
-            {
-                m_isDefault = value;
-            }
-        }
-
-        public void PerformClick()
-        {
-            base.OnClick(EventArgs.Empty);
-        }
-
-        #endregion
-
         #region  Properties
+
+        public bool IsDown { get { return m_isDown; } }
 
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -121,17 +90,6 @@ namespace ScreenShot
         [Description("当鼠标放在控件可见处的提示文本")]
         public string ToolTipText { get; set; }
 
-        [Description("按钮当前是否处于选中状态")]
-        public bool ButtonIsSelect { get; protected set; }
-
-        #endregion
-
-        #region Description Changes
-        [Description("Controls how the ImageButton will handle image placement and control sizing.")]
-        public new PictureBoxSizeMode SizeMode { get { return base.SizeMode; } set { base.SizeMode = value; } }
-
-        [Description("Controls what type of border the ImageButton should have.")]
-        public new BorderStyle BorderStyle { get { return base.BorderStyle; } set { base.BorderStyle = value; } }
         #endregion
 
         #region Hiding
@@ -144,21 +102,6 @@ namespace ScreenShot
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new Image BackgroundImage { get { return base.BackgroundImage; } set { base.BackgroundImage = value; } }
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new String ImageLocation { get { return base.ImageLocation; } set { base.ImageLocation = value; } }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new Image ErrorImage { get { return base.ErrorImage; } set { base.ErrorImage = value; } }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new Image InitialImage { get { return base.InitialImage; } set { base.InitialImage = value; } }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new bool WaitOnLoad { get { return base.WaitOnLoad; } set { base.WaitOnLoad = value; } }
         #endregion
 
         #region override
@@ -174,23 +117,23 @@ namespace ScreenShot
                 ShowTooTip(ToolTipText);
             }
 
-            if (ButtonIsSelect)
-                m_state = ControlState.Down;
+            if (Checked)
+                m_state = MyControlState.Down;
             else
-                m_state = ControlState.Highlight;
+                m_state = MyControlState.Highlight;
 
             Invalidate();
-            
+
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
 
-            if (ButtonIsSelect)
-                m_state = ControlState.Down;
+            if (m_isDown)
+                m_state = MyControlState.Down;
             else
-                m_state = ControlState.Normal;
+                m_state = MyControlState.Normal;
 
             Invalidate();
         }
@@ -201,33 +144,42 @@ namespace ScreenShot
 
             if (e.Button == MouseButtons.Left)
             {
-                if (ButtonIsSelect)
+                if (m_isDown)
                 {
-                    ButtonIsSelect = false;
-                    m_state = ControlState.Highlight;
+                    m_state = MyControlState.Highlight;
+                    m_isDown = false;
                 }
                 else
                 {
-                    ButtonIsSelect = true;
-                    m_state = ControlState.Down;
+                    m_isDown = true;
+                    m_state = MyControlState.Down;
                 }
-                this.Focus();
                 Invalidate();
             }
         }
 
-        protected override void OnLostFocus(EventArgs e)
+        protected override void OnCheckedChanged(EventArgs e)
         {
-            base.OnLostFocus(e);
+            base.OnCheckedChanged(e);
 
-            ButtonIsSelect = false;
-            m_state = ControlState.Normal;
-            m_holdingSpace = false;
+            if (Checked)
+            {
+                m_isDown = true;
+                m_state = MyControlState.Down;
+            }
+            else
+            {
+                m_isDown = false;
+                m_state = MyControlState.Normal;
+            }
             Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs pe)
         {
+            base.OnPaint(pe);
+            base.OnPaintBackground(pe);
+
             Rectangle imageRect, textRect;
             CalculateRect(out imageRect, out textRect);
 
@@ -241,14 +193,14 @@ namespace ScreenShot
             }
             switch (m_state)
             {
-                case ControlState.Highlight:
+                case MyControlState.Highlight:
                     MethodHelper.DrawImageWithNineRect(
                          pe.Graphics,
                        m_glassHotImg,
                         ClientRectangle,
                         new Rectangle(0, 0, m_glassDownImg.Width, m_glassDownImg.Height));
                     break;
-                case ControlState.Down:
+                case MyControlState.Down:
                     MethodHelper.DrawImageWithNineRect(
                          pe.Graphics,
                         m_glassDownImg,

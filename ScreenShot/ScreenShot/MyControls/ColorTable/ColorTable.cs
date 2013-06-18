@@ -8,14 +8,22 @@ using System.Drawing.Drawing2D;
 
 namespace ScreenShot
 {
+    /****************************************************************
+    * 
+    *             Dcrp：颜色表控件
+    *           Author：曹江波
+    *             Blog: http://www.cnblogs.com/Keep-Silence-/
+    *             Date: 2013-5-29
+    *
+    *****************************************************************/
+
     public class ColorTable : Panel
     {
         #region Field
 
-        private Color COLORTABLE_BACKGROUND_COLOR = Color.FromArgb(200, 222, 238, 255);
-
         private ColorButton[] m_colorsButtons = new ColorButton[16];   //2 x 8
         private ColorButton m_selectColorButton;
+        private bool m_isDrawBorder = false;                          //是否绘制边框
         private const byte m_offset = 1;
 
         #endregion
@@ -32,9 +40,21 @@ namespace ScreenShot
 
         #region Properity
 
+        /// <summary>
+        /// ColorTable中选中的颜色
+        /// </summary>
         public Color SelectColor
         {
             get { return m_selectColorButton.Color; }
+        }
+
+        /// <summary>
+        /// 是否绘制边框
+        /// </summary>
+        public bool IsDrawBorder
+        {
+            get { return m_isDrawBorder; }
+            set { m_isDrawBorder = value; }
         }
 
 
@@ -46,9 +66,17 @@ namespace ScreenShot
         {
             base.OnPaint(e);
 
-            using (SolidBrush sbrush = new SolidBrush(COLORTABLE_BACKGROUND_COLOR))
+            using (SolidBrush sbrush = new SolidBrush(MyControlColors.BACKGROUND_COLOR))
             {
                 e.Graphics.FillRectangle(sbrush, ClientRectangle);
+                if (m_isDrawBorder)
+                {
+                    using (Pen pen = new Pen(MyControlColors.BORDER_COLOR))
+                    {
+                        e.Graphics.DrawRectangle(pen,
+                            new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1));
+                    }
+                }
             }
         }
 
@@ -119,12 +147,12 @@ namespace ScreenShot
             //events
             for (int i = 0; i < m_colorsButtons.Length; i++)
             {
-                m_colorsButtons[i].Click +=new EventHandler(OnColorButtonClick);
+                m_colorsButtons[i].Click += new EventHandler(OnColorButtonClick);
             }
 
         }
 
-        private void OnColorButtonClick(object sender,EventArgs e)
+        private void OnColorButtonClick(object sender, EventArgs e)
         {
             ColorButton selectColor = sender as ColorButton;
             if (selectColor != null)

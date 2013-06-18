@@ -9,12 +9,13 @@ using System.ComponentModel;
 namespace ScreenShot
 {
     /****************************************************************
-   * 
-   *           Author：苦笑(wrysmile)
-   *             Blog: http://www.cnblogs.com/Keep-Silence-/
-   *             Date: 2013-5-28
-   *
-   *****************************************************************/
+    * 
+    *             Dcrp：颜色按钮，用以构造 ColorTable 控件
+    *           Author：曹江波
+    *             Blog: http://www.cnblogs.com/Keep-Silence-/
+    *             Date: 2013-5-28
+    *
+    *****************************************************************/
 
     public class ColorButton : Button
     {
@@ -24,7 +25,7 @@ namespace ScreenShot
         private static readonly Color COLOR_INNERBORDAR = Color.White;
 
         private Color m_Color = Color.Red;
-        private ControlState m_State = ControlState.Normal;
+        private MyControlState m_State = MyControlState.Normal;
         private bool m_IsKeepHighlight = false;     //是否长保持高亮状态                   
 
         #endregion
@@ -67,10 +68,10 @@ namespace ScreenShot
         {
             base.OnMouseEnter(e);
 
-            if (m_State == ControlState.Normal)
-                m_State = ControlState.Highlight;
+            if (m_State == MyControlState.Normal)
+                m_State = MyControlState.Highlight;
             else
-                m_State = ControlState.Down;
+                m_State = MyControlState.Down;
 
             Invalidate();
         }
@@ -81,7 +82,7 @@ namespace ScreenShot
 
             if (e.Button == MouseButtons.Left)
             {
-                m_State = ControlState.Down;
+                m_State = MyControlState.Down;
                 Invalidate();
             }
         }
@@ -90,10 +91,10 @@ namespace ScreenShot
         {
             base.OnMouseLeave(e);
 
-            if (m_State == ControlState.Down)
-                m_State = ControlState.Down;
+            if (m_State == MyControlState.Down)
+                m_State = MyControlState.Down;
             else
-                m_State = ControlState.Normal;
+                m_State = MyControlState.Normal;
 
             Invalidate();
         }
@@ -102,7 +103,7 @@ namespace ScreenShot
         {
             base.OnLostFocus(e);
 
-            m_State = ControlState.Normal;
+            m_State = MyControlState.Normal;
             Invalidate();
         }
 
@@ -110,7 +111,7 @@ namespace ScreenShot
         {
             base.OnPaint(e);
             if (m_IsKeepHighlight)
-                m_State = ControlState.Highlight;
+                m_State = MyControlState.Highlight;
 
             Graphics g = e.Graphics;
             Rectangle rect = new Rectangle(0, 0, Width - 1, Height - 1);
@@ -120,8 +121,8 @@ namespace ScreenShot
                 g.FillRectangle(sbrush, rect);
                 using (Pen pen = new Pen(COLOR_BORDAR))
                 {
-                    if (m_State == ControlState.Highlight ||
-                        m_State == ControlState.Down)
+                    if (m_State == MyControlState.Highlight ||
+                        m_State == MyControlState.Down)
                     {
                         pen.Color = COLOR_INNERBORDAR;
                         g.DrawRectangle(pen,rect);

@@ -13,7 +13,17 @@ using System.Diagnostics;
 
 namespace ScreenShot
 {
-    public partial class ScreenShotMain : Form
+
+    /****************************************************************
+    * 
+    *             Dcrp：ScreenShot主窗体
+    *           Author：曹江波
+    *             Blog: http://www.cnblogs.com/Keep-Silence-/
+    *             Update: 2013-6-13
+    *
+    *****************************************************************/
+
+    public partial class ScreenShotForm : Form
     {
         #region Const
 
@@ -39,23 +49,17 @@ namespace ScreenShot
 
         #region Field
 
-        private Image m_ScreenImg;                              //屏幕原始截图
-        private Image m_SelectImg;                              //选区图片
+        private Image m_screenImg;                              //屏幕原始截图
+        private Image m_selectImg;                              //选区图片
 
-        private ShotState m_ShotState = ShotState.None;
+        private ShotState m_shotState = ShotState.None;
 
-        private Point m_StartPoint;
-        private Rectangle m_SelectedRect = Rectangle.Empty;     //选区
+        private Point m_startPoint;
+        private Rectangle m_selectedRect = Rectangle.Empty;     //选区
 
-        private Point[] m_RectNodes = new Point[8];             // 选区8个结点
-        private int m_EditFlag = 8;                             // 编辑标记：0-7：调整大小  8：默认  9：移动
-        private bool m_IsStartEditRect = false;
-        private Rectangle m_EditExRect;                          // 选区编辑之前的大小
-
-        private ShotToolBar m_ShotToolBar;
-        private ColorTable m_ColorTable;
-
-        private bool m_IsDrawing = false;
+        private Point[] m_rectNodes = new Point[8];             // 选区8个结点
+        private int m_editFlag = 8;                             // 编辑标记：0-7：调整大小  8：默认  9：移动
+        private Rectangle m_editExRect;                         // 选区编辑之前的大小
 
         #endregion
 
@@ -69,11 +73,11 @@ namespace ScreenShot
 
         #region Constructor
 
-        public ScreenShotMain()
+        public ScreenShotForm()
         {
-            FieldIni();
-            ScreenShotFormIni();
-            ToolBarEventIni();
+            InitializeComponent();
+            FieldAndFormIni();
+            ToolBarEventsIni();
         }
 
         #endregion
@@ -84,17 +88,17 @@ namespace ScreenShot
         {
             if (e.Button == MouseButtons.Left)
             {
-                m_StartPoint = e.Location;
+                m_startPoint = e.Location;
 
-                if (m_ShotState == ShotState.None)  //新选区
+                if (m_shotState == ShotState.None)  //新选区
                 {
-                    m_ShotState = ShotState.CreateRect;
+                    m_shotState = ShotState.CreatingRect;
                 }
-                else if (m_ShotState == ShotState.EditRect) //编辑选区
+                else if (m_shotState == ShotState.FinishedRect) //调整大小
                 {
-                    m_IsStartEditRect = true;
-                    m_EditExRect = m_SelectedRect;
-                    m_EditFlag = SetSelectRectCursor(e.Location);
+                    m_shotState = ShotState.ResizingRect;
+                    m_editExRect = m_selectedRect;
+                    m_editFlag = SetSelectRectCursor(e.Location);
                 }
             }
             base.OnMouseDown(e);
@@ -104,25 +108,29 @@ namespace ScreenShot
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (m_SelectedRect == Rectangle.Empty)
-                    m_ShotState = ShotState.None;
-                else if (m_ShotState == ShotState.CreateRect)    //创建新选区完成，松开鼠标右键进入编辑状态
+                if (m_selectedRect == Rectangle.Empty)
                 {
-                    m_ShotState = ShotState.EditRect;
+                    m_shotState = ShotState.None;
+                }
+                else if (m_shotState == ShotState.CreatingRect)    //创建新选区完成
+                {
+                    m_shotState = ShotState.FinishedRect;
                     ShowShotToolBar();
                 }
-                else if (m_ShotState == ShotState.EditRect) //编辑选区时，松开鼠标右键停止编辑选区
-                    m_IsStartEditRect = false;
+                else if (m_shotState == ShotState.ResizingRect)      //完成调整大小
+                {
+                    m_shotState = ShotState.FinishedRect;
+                }
             }
             else if (e.Button == MouseButtons.Right)
             {
-                if (m_ShotState == ShotState.None)
+                if (m_shotState == ShotState.None)
                     this.Close();
                 else
                 {
-                    if (m_SelectedRect.Contains(e.Location))
+                    if (m_selectedRect.Contains(e.Location))
                     {
-                        //MessageBox.Show("截图菜单");
+                        MessageBox.Show("截图菜单");
                     }
                     else
                         ClearScrren();
@@ -136,15 +144,14 @@ namespace ScreenShot
         {
             base.OnMouseMove(e);
 
-            if (m_ShotState == ShotState.CreateRect)
+            if (m_shotState == ShotState.CreatingRect)
             {
                 Point endPoint = e.Location;
-                m_SelectedRect = new RECT(m_StartPoint, endPoint).ToRectangle();
+                m_selectedRect = new RECT(m_startPoint, endPoint).ToRectangle();
             }
-            else if (m_ShotState == ShotState.EditRect && m_IsStartEditRect == true)
+            else if (m_shotState == ShotState.ResizingRect)
             {
-                if (!m_IsDrawing)
-                    ResizeSelectRect(m_EditFlag, e.Location);
+                ResizeSelectRect(m_editFlag, e.Location);
             }
 
             Invalidate();
@@ -175,34 +182,28 @@ namespace ScreenShot
         {
             base.OnMouseDoubleClick(e);
 
-            if (m_ShotState == ShotState.EditRect && m_SelectedRect.Contains(e.Location))
-                SaveSelectImage();
+            if (m_selectedRect.Contains(e.Location))
+            {
+               bool isSucessed = SaveSelectImage();
+               if (isSucessed)
+                   this.Close();
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (m_ScreenImg != null)
+                if (m_screenImg != null)
                 {
-                    m_ScreenImg.Dispose();
-                    m_ScreenImg = null;
+                    m_screenImg.Dispose();
+                    m_screenImg = null;
                 }
-                if (m_SelectImg != null)
+                if (m_selectImg != null)
                 {
-                    m_SelectImg.Dispose();
-                    m_SelectImg = null;
+                    m_selectImg.Dispose();
+                    m_selectImg = null;
                 }
-            }
-            if (m_ShotToolBar != null)
-            {
-                m_ShotToolBar.Dispose();
-                m_ShotToolBar = null;
-            }
-            if (m_ColorTable != null)
-            {
-                m_ColorTable.Dispose();
-                m_ColorTable = null;
             }
             base.Dispose(disposing);
         }
@@ -220,29 +221,18 @@ namespace ScreenShot
 
         #region Private
 
-        private void FieldIni()
+        private void FieldAndFormIni()
         {
-            m_ScreenImg = GetScreenImg();
-            m_ShotToolBar = new ShotToolBar();
-            m_ShotToolBar.Visible = false;
-            m_ColorTable = new ColorTable();
-            m_ColorTable.Visible = false;
-        }
 
-        private void ScreenShotFormIni()
-        {
+            m_screenImg = GetScreenImg();
+
             //双缓冲
             SetStyle(ControlStyles.UserPaint |
-                ControlStyles.AllPaintingInWmPaint |
-                ControlStyles.OptimizedDoubleBuffer,
-                true);
+                     ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer,
+                     true);
 
-            this.SuspendLayout();
-            //
-            //ScreenShotForm
-            //
-            this.Controls.Add(m_ShotToolBar);
-            this.Controls.Add(m_ColorTable);
+
             this.FormBorderStyle = FormBorderStyle.None;
             this.ShowInTaskbar = false;
             this.TopMost = true;
@@ -251,8 +241,6 @@ namespace ScreenShot
 
             this.BackgroundImage = GetScreenImgWithMask();
             this.Cursor = CURSOR_DEFAULT;
-
-            this.ResumeLayout();
         }
 
         /* 获取原始屏幕截图 */
@@ -270,7 +258,7 @@ namespace ScreenShot
         /* 获取带有遮罩层的屏幕截图 */
         private Image GetScreenImgWithMask()
         {
-            Image sceenMaskImg = new Bitmap(m_ScreenImg);
+            Image sceenMaskImg = new Bitmap(m_screenImg);
             using (Graphics g = Graphics.FromImage(sceenMaskImg))
             {
                 using (SolidBrush maskBrush = new SolidBrush(Color.FromArgb(SCREEN_ALPHA_, 0, 0, 0)))
@@ -284,13 +272,15 @@ namespace ScreenShot
         /* 清除所有的屏幕截图操作，还原最开始的状态 */
         private void ClearScrren()
         {
-            m_ShotState = ShotState.None;
-            m_SelectedRect = Rectangle.Empty;
-            m_IsStartEditRect = false;
-            m_EditExRect = Rectangle.Empty;
-            m_IsDrawing = false;
-            m_ColorTable.Visible = false;
-            m_ShotToolBar.Visible = false;
+            m_shotState = ShotState.None;
+            m_selectedRect = Rectangle.Empty;
+            m_editExRect = Rectangle.Empty;
+            m_drawStyle = DrawStyle.None;
+
+            shotToolBar.Visible = false;
+            colorTable.Visible = false;
+            colorTableWithWidth.Visible = false;
+            colorTableWithFont.Visible = false;
 
             this.BackgroundImage = GetScreenImgWithMask();
             this.Invalidate();
@@ -326,7 +316,7 @@ namespace ScreenShot
             int flag = 8;
             Cursor cur = RectCursors[8];
 
-            if (m_SelectedRect.Contains(mousePt))
+            if (m_selectedRect.Contains(mousePt))
             {
                 flag = 9;
                 cur = RectCursors[9];
@@ -337,10 +327,10 @@ namespace ScreenShot
                 cur = RectCursors[8];
             }
 
-            for (int i = 0; i < m_RectNodes.Length; i++)
+            for (int i = 0; i < m_rectNodes.Length; i++)
             {
-                Rectangle nodeRect = new Rectangle(m_RectNodes[i].X - LINE_NODE_WIDTH,
-                                                   m_RectNodes[i].Y - LINE_NODE_WIDTH,
+                Rectangle nodeRect = new Rectangle(m_rectNodes[i].X - LINE_NODE_WIDTH,
+                                                   m_rectNodes[i].Y - LINE_NODE_WIDTH,
                                                    2 * LINE_NODE_WIDTH,
                                                    2 * LINE_NODE_WIDTH);
                 if (nodeRect.Contains(mousePt))
@@ -358,81 +348,81 @@ namespace ScreenShot
         /* 限制选区不能超过窗体边界 */
         private void MakeLimitToSelectRect()
         {
-            if (m_SelectedRect.X < 0)
-                m_SelectedRect.X = 0;
-            if (m_SelectedRect.Y < 0)
-                m_SelectedRect.Y = 0;
-            if (m_SelectedRect.Right > ClientSize.Width)
-                m_SelectedRect.X = ClientSize.Width - m_SelectedRect.Width;
-            if (m_SelectedRect.Bottom > ClientSize.Height)
-                m_SelectedRect.Y = ClientSize.Height - m_SelectedRect.Height;
+            if (m_selectedRect.X < 0)
+                m_selectedRect.X = 0;
+            if (m_selectedRect.Y < 0)
+                m_selectedRect.Y = 0;
+            if (m_selectedRect.Right > ClientSize.Width)
+                m_selectedRect.X = ClientSize.Width - m_selectedRect.Width;
+            if (m_selectedRect.Bottom > ClientSize.Height)
+                m_selectedRect.Y = ClientSize.Height - m_selectedRect.Height;
         }
 
         private void MoveSelectRect(int x, int y)
         {
-            m_SelectedRect.Offset(x, y);
+            m_selectedRect.Offset(x, y);
             Invalidate();
         }
 
         private void ResizeSelectRect(int flag, Point curPos)
         {
-            RECT rectEx = new RECT(m_EditExRect);
+            RECT rectEx = new RECT(m_editExRect);
 
             switch (flag)   //0-7：调整大小  8：默认  9：移动
             {
                 case 0:
-                    m_SelectedRect = new RECT(curPos,
+                    m_selectedRect = new RECT(curPos,
                                               rectEx.BottomRight).ToRectangle();
                     break;
                 case 1:
-                    m_SelectedRect = new RECT(new Point(curPos.X, rectEx.Top),
+                    m_selectedRect = new RECT(new Point(curPos.X, rectEx.Top),
                                               rectEx.BottomRight).ToRectangle();
                     break;
                 case 2:
-                    m_SelectedRect = new RECT(new Point(curPos.X, rectEx.Top),
+                    m_selectedRect = new RECT(new Point(curPos.X, rectEx.Top),
                                               new Point(rectEx.Right, curPos.Y)).ToRectangle();
                     break;
                 case 3:
-                    m_SelectedRect = new RECT(rectEx.TopLeft,
+                    m_selectedRect = new RECT(rectEx.TopLeft,
                                               new Point(rectEx.Right, curPos.Y)).ToRectangle();
                     break;
                 case 4:
-                    m_SelectedRect = new RECT(rectEx.TopLeft, curPos).ToRectangle();
+                    m_selectedRect = new RECT(rectEx.TopLeft, curPos).ToRectangle();
                     break;
                 case 5:
-                    m_SelectedRect = new RECT(rectEx.TopLeft, new Point(curPos.X, rectEx.Bottom)).ToRectangle();
+                    m_selectedRect = new RECT(rectEx.TopLeft, new Point(curPos.X, rectEx.Bottom)).ToRectangle();
                     break;
                 case 6:
-                    m_SelectedRect = new RECT(new Point(rectEx.Left, curPos.Y),
+                    m_selectedRect = new RECT(new Point(rectEx.Left, curPos.Y),
                                               new Point(curPos.X, rectEx.Bottom)).ToRectangle();
                     break;
                 case 7:
-                    m_SelectedRect = new RECT(new Point(rectEx.Left, curPos.Y),
+                    m_selectedRect = new RECT(new Point(rectEx.Left, curPos.Y),
                                               rectEx.BottomRight).ToRectangle();
                     break;
                 case 8:
                     break;
                 case 9:
-                    MoveSelectRect(curPos.X - m_StartPoint.X, curPos.Y - m_StartPoint.Y);
-                    m_StartPoint.X = curPos.X;
-                    m_StartPoint.Y = curPos.Y;
+                    MoveSelectRect(curPos.X - m_startPoint.X, curPos.Y - m_startPoint.Y);
+                    m_startPoint.X = curPos.X;
+                    m_startPoint.Y = curPos.Y;
                     break;
             }
         }
 
         private Image GetSelectImage()
         {
-            Bitmap selectBmp = new Bitmap(m_SelectedRect.Width,
-                                          m_SelectedRect.Height,
+            Bitmap selectBmp = new Bitmap(m_selectedRect.Width,
+                                          m_selectedRect.Height,
                                           PixelFormat.Format32bppArgb);
 
             using (Graphics g = Graphics.FromImage(selectBmp))
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.DrawImage(m_ScreenImg,
+                g.DrawImage(m_screenImg,
                                       new Rectangle(0, 0, selectBmp.Width, selectBmp.Height),
-                                      m_SelectedRect,
+                                      m_selectedRect,
                                       GraphicsUnit.Pixel);
             }
             if (selectBmp != null)
@@ -441,8 +431,9 @@ namespace ScreenShot
                 throw new Exception("Get selected image faild .");
         }
 
-        private void SaveSelectImage()
+        private bool SaveSelectImage()
         {
+            bool result = false;
             using (SaveFileDialog saveDialog = new SaveFileDialog())
             {
                 saveDialog.InitialDirectory = ImageSaveInitialDirectory;
@@ -476,37 +467,38 @@ namespace ScreenShot
                     }
                     Image selectImg = GetSelectImage();
                     selectImg.Save(saveDialog.FileName, format);
-                    this.Close();
+                    result = true;
                 }
             }
+            return result;
         }
 
         private void ProcessKeyDownEnvent(KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
             {
-                if (m_ShotState == ShotState.None)
+                if (m_shotState == ShotState.None)
                     this.Close();
                 else
                     ClearScrren();
             }
             if (e.KeyCode == Keys.Enter)
             {
-                if (m_ShotState == ShotState.EditRect)
+                if (m_shotState == ShotState.DrawInRect)
                     SaveSelectImage();
             }
-            if (m_SelectedRect != Rectangle.Empty)
+            if (m_selectedRect != Rectangle.Empty)
             {
                 if (e.KeyCode == Keys.Up)
                 {
                     if (e.Modifiers == Keys.Shift)   //Shift + ↑ 向上调整大小
                     {
                         //上边界禁止调整大小
-                        if (m_SelectedRect.Y != 0)
-                            m_SelectedRect = new Rectangle(m_SelectedRect.X,
-                                                           m_SelectedRect.Y - 1,
-                                                           m_SelectedRect.Width,
-                                                           m_SelectedRect.Height + 1);
+                        if (m_selectedRect.Y != 0)
+                            m_selectedRect = new Rectangle(m_selectedRect.X,
+                                                           m_selectedRect.Y - 1,
+                                                           m_selectedRect.Width,
+                                                           m_selectedRect.Height + 1);
                         Invalidate();
                     }
                     else
@@ -518,11 +510,11 @@ namespace ScreenShot
                     if (e.Modifiers == Keys.Shift)
                     {
                         //下边界禁止调整大小
-                        if (m_SelectedRect.Bottom != Height)
-                            m_SelectedRect = new Rectangle(m_SelectedRect.X,
-                                                           m_SelectedRect.Y,
-                                                           m_SelectedRect.Width,
-                                                           m_SelectedRect.Height + 1);
+                        if (m_selectedRect.Bottom != Height)
+                            m_selectedRect = new Rectangle(m_selectedRect.X,
+                                                           m_selectedRect.Y,
+                                                           m_selectedRect.Width,
+                                                           m_selectedRect.Height + 1);
                         Invalidate();
                     }
                     else
@@ -534,11 +526,11 @@ namespace ScreenShot
                     if (e.Modifiers == Keys.Shift)
                     {
                         //左边界禁止调整大小
-                        if (m_SelectedRect.X != 0)
-                            m_SelectedRect = new Rectangle(m_SelectedRect.X - 1,
-                                                           m_SelectedRect.Y,
-                                                           m_SelectedRect.Width + 1,
-                                                           m_SelectedRect.Height);
+                        if (m_selectedRect.X != 0)
+                            m_selectedRect = new Rectangle(m_selectedRect.X - 1,
+                                                           m_selectedRect.Y,
+                                                           m_selectedRect.Width + 1,
+                                                           m_selectedRect.Height);
                         Invalidate();
                     }
                     else
@@ -551,11 +543,11 @@ namespace ScreenShot
                     {
 
                         //右边界禁止调整大小
-                        if (m_SelectedRect.Right != Width)
-                            m_SelectedRect = new Rectangle(m_SelectedRect.X,
-                                                           m_SelectedRect.Y,
-                                                           m_SelectedRect.Width + 1,
-                                                           m_SelectedRect.Height);
+                        if (m_selectedRect.Right != Width)
+                            m_selectedRect = new Rectangle(m_selectedRect.X,
+                                                           m_selectedRect.Y,
+                                                           m_selectedRect.Width + 1,
+                                                           m_selectedRect.Height);
                         Invalidate();
                     }
                     else
@@ -566,24 +558,24 @@ namespace ScreenShot
 
         private void DrawSelectRect(Graphics g)
         {
-            if (m_SelectedRect != Rectangle.Empty)
+            if (m_selectedRect != Rectangle.Empty)
             {
                 MakeLimitToSelectRect();
 
                 //将选区的图片以屏幕原图突出显示出来
-                g.DrawImage(m_ScreenImg, m_SelectedRect, m_SelectedRect, GraphicsUnit.Pixel);
+                g.DrawImage(m_screenImg, m_selectedRect, m_selectedRect, GraphicsUnit.Pixel);
 
                 //绘制选区矩形与结点
                 using (Pen redPen = new Pen(LINE_COLOR_CUSTOM, LINE_WIDTH_CUSTOM))
                 {
                     //绘制选中矩形
-                    g.DrawRectangle(redPen, m_SelectedRect);
+                    g.DrawRectangle(redPen, m_selectedRect);
 
                     //绘制选中矩形的8个调整大小的节点
-                    m_RectNodes = GetRectNodes(m_SelectedRect);
+                    m_rectNodes = GetRectNodes(m_selectedRect);
                     using (SolidBrush redBrush = new SolidBrush(LINE_COLOR_CUSTOM))
                     {
-                        foreach (Point node in m_RectNodes)
+                        foreach (Point node in m_rectNodes)
                             g.FillRectangle(
                                 redBrush,
                                 new Rectangle(
@@ -598,19 +590,19 @@ namespace ScreenShot
 
         private void DrawSelectRectInfo(Graphics g)
         {
-            if (m_SelectedRect != Rectangle.Empty)
+            if (m_selectedRect != Rectangle.Empty)
             {
                 Rectangle infoRect = new Rectangle();
                 infoRect.Width = INFO_SELECTRECT_WIDTH;
                 infoRect.Height = INFO_SELECTRECT_HEIGHT;
                 int offset = 3;
-                infoRect.X = m_SelectedRect.X + offset;
+                infoRect.X = m_selectedRect.X + offset;
 
                 //上边界检查
-                if (m_SelectedRect.Y < INFO_SELECTRECT_HEIGHT + LINE_WIDTH_CUSTOM)
-                    infoRect.Y = m_SelectedRect.Y + offset;
+                if (m_selectedRect.Y < INFO_SELECTRECT_HEIGHT + LINE_WIDTH_CUSTOM)
+                    infoRect.Y = m_selectedRect.Y + offset;
                 else
-                    infoRect.Y = m_SelectedRect.Y - INFO_SELECTRECT_HEIGHT - offset;
+                    infoRect.Y = m_selectedRect.Y - INFO_SELECTRECT_HEIGHT - offset;
 
                 //绘制alpha 背景
                 using (SolidBrush sbrush = new SolidBrush(Color.FromArgb(INFO_ALPHA, 0, 0, 0)))
@@ -618,8 +610,8 @@ namespace ScreenShot
                     g.FillRectangle(sbrush, infoRect);
                     sbrush.Color = Color.White;
                     string infoStr = string.Format("大小：{0} x {1} \n双击可保存图像",
-                                                    m_SelectedRect.Width,
-                                                    m_SelectedRect.Height);
+                                                    m_selectedRect.Width,
+                                                    m_selectedRect.Height);
 
                     using (Font fontStr = new Font("微软雅黑", 9))
                     {
@@ -632,7 +624,8 @@ namespace ScreenShot
 
         private void DrawMouseMoveInfo(Graphics g)
         {
-            if (m_ShotState != ShotState.EditRect)
+            if (m_shotState == ShotState.None ||
+                m_shotState == ShotState.CreatingRect)
             {
                 Rectangle infoRect = new Rectangle();
                 infoRect.Width = INFO_MOVING_WIDTH;
@@ -660,7 +653,7 @@ namespace ScreenShot
                 using (Pen picPen = new Pen(Color.Black, 1))
                 {
                     //放大图
-                    g.DrawImage(m_ScreenImg, picRect, rangeRect, GraphicsUnit.Pixel);
+                    g.DrawImage(m_screenImg, picRect, rangeRect, GraphicsUnit.Pixel);
 
                     //内外边框
                     g.DrawRectangle(picPen, picRect);
@@ -684,10 +677,10 @@ namespace ScreenShot
                     INFO_MOVING_WIDTH,
                     INFO_MOVING_STR_HEIGHT);
 
-                Color currentColor = MethodHelper.GetColor(m_ScreenImg, Control.MousePosition.X, Control.MousePosition.Y);
+                Color currentColor = MethodHelper.GetColor(m_screenImg, Control.MousePosition.X, Control.MousePosition.Y);
                 string infoStr = string.Format("大小：{0} x {1} \nRGB：({2},{3},{4})",
-                                                    m_SelectedRect.Width,
-                                                    m_SelectedRect.Height,
+                                                    m_selectedRect.Width,
+                                                    m_selectedRect.Height,
                                                     currentColor.R,
                                                     currentColor.G,
                                                     currentColor.B);
@@ -709,122 +702,47 @@ namespace ScreenShot
 
         private void ShowShotToolBar()
         {
-            if (m_ShotState == ShotState.EditRect)
+            bool isGetSelectRect = (m_shotState == ShotState.FinishedRect ||
+                                    m_shotState == ShotState.ResizingRect ||
+                                    m_shotState == ShotState.DrawInRect);
+            if (isGetSelectRect)
             {
-                int yoffset = 5;
-                Point location;
-                if (m_SelectedRect.Bottom > Height - yoffset - m_ShotToolBar.Height)
+                if (m_drawStyle == DrawStyle.None)
                 {
-                    if (m_SelectedRect.Top < m_ShotToolBar.Height + yoffset)
-                        location = new Point(m_SelectedRect.Right - m_ShotToolBar.Width - yoffset,
-                                             m_SelectedRect.Top + yoffset);
-                    else
-                        location = new Point(m_SelectedRect.Right - m_ShotToolBar.Width,
-                                             m_SelectedRect.Top - m_ShotToolBar.Height - yoffset);
+                    SetToolBarLocation();
+                    shotToolBar.Visible = true;
                 }
+            }
+            else
+            {
+                shotToolBar.Visible = false;
+            }
+        }
+
+        private void SetToolBarLocation()
+        {
+            Point location = Point.Empty;
+            int yoffset = 5;
+            if (m_selectedRect.Bottom > Height - yoffset - shotToolBar.Height)
+            {
+                if (m_selectedRect.Top < shotToolBar.Height + yoffset)
+                    location = new Point(m_selectedRect.Right - shotToolBar.Width - yoffset,
+                                         m_selectedRect.Top + yoffset);
                 else
-                    location = new Point(m_SelectedRect.Right - m_ShotToolBar.Width,
-                                         m_SelectedRect.Bottom + yoffset);
-                if (m_SelectedRect.Right < m_ShotToolBar.Width)
-                    location = new Point(m_SelectedRect.Left, location.Y);
-                m_ShotToolBar.Location = location;
-                m_ShotToolBar.Visible = true;
+                    location = new Point(m_selectedRect.Right - shotToolBar.Width,
+                                         m_selectedRect.Top - shotToolBar.Height - yoffset);
             }
             else
             {
-                m_ShotToolBar.Visible = false;
+                location = new Point(m_selectedRect.Right - shotToolBar.Width,
+                                     m_selectedRect.Bottom + yoffset);
             }
+            if (m_selectedRect.Right < shotToolBar.Width)
+                location = new Point(m_selectedRect.Left, location.Y);
+
+            shotToolBar.Location = location;
         }
 
         #endregion
-
-        #region ToolBarEvent
-
-        private void ToolBarEventIni()
-        {
-            m_ShotToolBar.ExitToolClick += new EventHandler(OnExitToolClick);
-            m_ShotToolBar.CopyImgToolClick += new EventHandler(OnCopyImgToolClick);
-            m_ShotToolBar.LoadImgToMSpaintToolClick += new EventHandler(OnLoadImgToMSpaintToolClick);
-            m_ShotToolBar.SaveToolClick += new EventHandler(OnSaveToolClick);
-
-            m_ShotToolBar.RectToolClick += new EventHandler(OnRectToolClick);
-            m_ShotToolBar.EllipseToolClick +=new EventHandler(OnEllipseToolClick);
-            m_ShotToolBar.ArrowToolClick +=new EventHandler(OnArrowToolClick);
-            m_ShotToolBar.TextToolClick +=new EventHandler(OnTextToolClick);
-            m_ShotToolBar.UndoToolClick +=new EventHandler(OnUndoToolClick);
-        }
-
-        private void OnExitToolClick(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void OnCopyImgToolClick(object sender, EventArgs e)
-        {
-            m_IsDrawing = false;
-            m_ColorTable.Visible = false;
-            m_SelectImg = GetSelectImage();
-            if (m_SelectImg != null)
-            {
-                Clipboard.SetDataObject(m_SelectImg, true);
-                this.Close();
-            }
-        }
-
-        private void OnLoadImgToMSpaintToolClick(object sender, EventArgs e)
-        {
-            m_IsDrawing = false;
-            m_ColorTable.Visible = false;
-            string tempDir = Environment.GetEnvironmentVariable("TEMP");
-            string mspaintDir = Environment.SystemDirectory + @"\mspaint.exe";
-            if (Directory.Exists(tempDir) && File.Exists(mspaintDir))
-            {
-                m_SelectImg = GetSelectImage();
-                string imgPath = tempDir + @"\WrysmileTemp.bmp";
-                m_SelectImg.Save(imgPath);
-                Process.Start(mspaintDir, imgPath);
-                this.Close();
-            }
-            else
-                MessageBox.Show("Load selected image to mspaint.exe faild.");
-        }
-
-        private void OnSaveToolClick(object sender, EventArgs e)
-        {
-            m_IsDrawing = false;
-            m_ColorTable.Visible = false;
-            SaveSelectImage();
-        }
-
-        private void OnRectToolClick(object sender, EventArgs e)
-        {
-            m_IsDrawing = true;
-            int yoffset = 3;
-            m_ColorTable.Location = new Point(m_ShotToolBar.Left, m_ShotToolBar.Bottom + yoffset);
-            m_ColorTable.Visible = true;
-        }
-
-        private void OnEllipseToolClick(object sender, EventArgs e)
-        {
-            m_IsDrawing = true;
-        }
-
-        private void OnArrowToolClick(object sender, EventArgs e)
-        {
-            m_IsDrawing = true;
-        }
-
-        private void OnTextToolClick(object sender, EventArgs e)
-        {
-            m_IsDrawing = true;
-        }
-
-        private void OnUndoToolClick(object sender, EventArgs e)
-        {
-            ClearScrren();
-        }
-
-        #endregion
-
     }
 }

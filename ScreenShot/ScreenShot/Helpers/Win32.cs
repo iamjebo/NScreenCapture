@@ -7,6 +7,16 @@ using System.Drawing;
 
 namespace ScreenShot
 {
+
+    /****************************************************************
+   * 
+   *             Dcrp：封装Win32平台的API函数与常量
+   *           Author：曹江波
+   *             Blog: http://www.cnblogs.com/Keep-Silence-/
+   *             Date: 2013-5-18
+   *
+   *****************************************************************/
+
     public class Win32
     {
 

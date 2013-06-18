@@ -16,9 +16,9 @@ namespace ScreenShot
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            ScreenShotMain capture = new ScreenShotMain();
+            ScreenShotForm capture = new ScreenShotForm();
             capture.ImageSaveFilename = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            capture.ImageSaveFilename = "WrySmile.jpg";
+            capture.ImageSaveFilename = "Nscreenshot.jpg";
 
             Application.Run(capture);
         }

@@ -9,37 +9,44 @@ using System.Windows.Forms;
 
 namespace ScreenShot
 {
-    /// <summary>
-    /// 截图工具栏
-    /// </summary>
+    /****************************************************************
+    * 
+    *             Dcrp：截图工具栏控件，提供对选区绘图操作。
+    *           Author：曹江波
+    *             Blog: http://www.cnblogs.com/Keep-Silence-/
+    *             Date: 2013-5-26
+    *
+    *****************************************************************/
+
     public partial class ShotToolBar : PictureBox
     {
         #region Field
 
-        private static readonly Color TOOLBAR_BORDER_COLOR = Color.FromArgb(200, 78, 153, 210);
-        private static readonly Color TOOLBAR_BACKGROUND_COLOR = Color.FromArgb(200, 222, 238, 255);
+        private GlassButton m_rectTool;
+        private GlassButton m_ellipseTool;
+        private GlassButton m_arrowTool;
+        private GlassButton m_brushTool;
+        private GlassButton m_textTool;
+        private GlassButton m_undoTool;
+        private GlassButton m_saveTool;
+        private GlassButton m_loadImgToMSpaintTool;
+        private GlassButton m_copyImgTool;
+        private GlassButton m_exitShotTool;
 
-        private object EventObject_Rect = new object();
-        private object EventObject_Ellipse = new object();
-        private object EventObject_Arrow = new object();
-        private object EventObject_Brush = new object();
-        private object EventObject_Text = new object();
-        private object EventObject_Undo = new object();
-        private object EventObject_Save = new object();
-        private object EventObject_LoadImgToMSpaint = new object();
-        private object EventObject_CopyImg = new object();
-        private object EventObject_Exit = new object();
+        #endregion
 
-        private GlassButton rectTool;
-        private GlassButton ellipseTool;
-        private GlassButton arrowTool;
-        private GlassButton brushTool;
-        private GlassButton textTool;
-        private GlassButton undoTool;
-        private GlassButton saveTool;
-        private GlassButton loadImgToMSpaintTool;
-        private GlassButton copyImgTool;
-        private GlassButton exitShotTool;
+        #region Properity
+
+        public GlassButton RectTool { get { return m_rectTool; } }
+        public GlassButton EllipseTool { get { return m_ellipseTool; } }
+        public GlassButton ArrowTool { get { return m_arrowTool; } }
+        public GlassButton BrushTool { get { return m_brushTool; } }
+        public GlassButton TextTool { get { return m_textTool; } }
+        public GlassButton UndoTool { get { return m_undoTool; } }
+        public GlassButton SaveTool { get { return m_saveTool; } }
+        public GlassButton LoadImgToMSpaintTool { get { return m_loadImgToMSpaintTool; } }
+        public GlassButton CopyImgTool { get { return m_copyImgTool; } }
+        public GlassButton ExitShotTool { get { return m_exitShotTool; } }
 
         #endregion
 
@@ -48,70 +55,6 @@ namespace ScreenShot
         public ShotToolBar()
         {
             ShotToolBarIni();
-        }
-
-        #endregion
-
-        #region Event
-
-        public event EventHandler RectToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Rect, value); }
-            remove { base.Events.RemoveHandler(EventObject_Rect, value); }
-        }
-
-        public event EventHandler EllipseToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Ellipse, value); }
-            remove { base.Events.RemoveHandler(EventObject_Ellipse, value); }
-        }
-
-        public event EventHandler ArrowToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Arrow, value); }
-            remove { base.Events.RemoveHandler(EventObject_Arrow, value); }
-        }
-
-        public event EventHandler BrushToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Brush, value); }
-            remove { base.Events.RemoveHandler(EventObject_Brush, value); }
-        }
-
-        public event EventHandler TextToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Text, value); }
-            remove { base.Events.RemoveHandler(EventObject_Text, value); }
-        }
-
-        public event EventHandler UndoToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Undo, value); }
-            remove { base.Events.RemoveHandler(EventObject_Undo, value); }
-        }
-
-        public event EventHandler SaveToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Save, value); }
-            remove { base.Events.RemoveHandler(EventObject_Save, value); }
-        }
-
-        public event EventHandler LoadImgToMSpaintToolClick
-        {
-            add { base.Events.AddHandler(EventObject_LoadImgToMSpaint, value); }
-            remove { base.Events.RemoveHandler(EventObject_LoadImgToMSpaint, value); }
-        }
-
-        public event EventHandler CopyImgToolClick
-        {
-            add { base.Events.AddHandler(EventObject_CopyImg, value); }
-            remove { base.Events.RemoveHandler(EventObject_CopyImg, value); }
-        }
-
-        public event EventHandler ExitToolClick
-        {
-            add { base.Events.AddHandler(EventObject_Exit, value); }
-            remove { base.Events.RemoveHandler(EventObject_Exit, value); }
         }
 
         #endregion
@@ -127,9 +70,9 @@ namespace ScreenShot
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            using (Pen pen = new Pen(TOOLBAR_BORDER_COLOR))
+            using (Pen pen = new Pen(MyControlColors.BORDER_COLOR))
             {
-                using (SolidBrush sbrush = new SolidBrush(TOOLBAR_BACKGROUND_COLOR))
+                using (SolidBrush sbrush = new SolidBrush(MyControlColors.BACKGROUND_COLOR))
                 {
                     e.Graphics.FillRectangle(sbrush, ClientRectangle);
                     e.Graphics.DrawRectangle(pen,
@@ -151,6 +94,18 @@ namespace ScreenShot
             }
         }
 
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+
+            foreach (Control control in Controls)
+            {
+                GlassButton glassBtn = control as GlassButton;
+                if (glassBtn != null)
+                    glassBtn.Checked = false;
+            }
+        }
+
         #endregion
 
         #region Private
@@ -158,256 +113,162 @@ namespace ScreenShot
         private void ShotToolBarIni()
         {
             ToolsIni();
-            ToolsEventIni();
         }
 
         private void ToolsIni()
         {
-            this.exitShotTool = new ScreenShot.GlassButton();
-            this.copyImgTool = new ScreenShot.GlassButton();
-            this.loadImgToMSpaintTool = new ScreenShot.GlassButton();
-            this.saveTool = new ScreenShot.GlassButton();
-            this.undoTool = new ScreenShot.GlassButton();
-            this.textTool = new ScreenShot.GlassButton();
-            this.brushTool = new ScreenShot.GlassButton();
-            this.arrowTool = new ScreenShot.GlassButton();
-            this.ellipseTool = new ScreenShot.GlassButton();
-            this.rectTool = new ScreenShot.GlassButton();
+            this.m_exitShotTool = new GlassButton();
+            this.m_copyImgTool = new GlassButton();
+            this.m_loadImgToMSpaintTool = new GlassButton();
+            this.m_saveTool = new GlassButton();
+            this.m_undoTool = new GlassButton();
+            this.m_textTool = new GlassButton();
+            this.m_brushTool = new GlassButton();
+            this.m_arrowTool = new GlassButton();
+            this.m_ellipseTool = new GlassButton();
+            this.m_rectTool = new GlassButton();
 
             this.SuspendLayout();
             // 
             // exitShotTool
             // 
-            this.exitShotTool.BackColor = System.Drawing.Color.Transparent;
-            this.exitShotTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.exitShotTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.exitShotTool.Location = new System.Drawing.Point(266, 3);
-            this.exitShotTool.Name = "exitShotTool";
-            this.exitShotTool.Size = new System.Drawing.Size(24, 24);
-            this.exitShotTool.TabIndex = 9;
-            this.exitShotTool.TabStop = false;
-            this.exitShotTool.ToolTipText = "退出截图";
-            this.exitShotTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Exit.png");
+            this.m_exitShotTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_exitShotTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_exitShotTool.Location = new System.Drawing.Point(266, 3);
+            this.m_exitShotTool.Name = "exitShotTool";
+            this.m_exitShotTool.Size = new System.Drawing.Size(24, 24);
+            this.m_exitShotTool.TabIndex = 9;
+            this.m_exitShotTool.TabStop = false;
+            this.m_exitShotTool.ToolTipText = "退出截图";
+            this.m_exitShotTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Exit.png");
 
             // 
             // copyImgTool
             // 
-            this.copyImgTool.BackColor = System.Drawing.Color.Transparent;
-            this.copyImgTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.copyImgTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.copyImgTool.Location = new System.Drawing.Point(237, 3);
-            this.copyImgTool.Name = "copyImgTool";
-            this.copyImgTool.Size = new System.Drawing.Size(24, 24);
-            this.copyImgTool.TabIndex = 8;
-            this.copyImgTool.TabStop = false;
-            this.copyImgTool.ToolTipText = "复制到剪切板";
-            this.copyImgTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.CopyImg.png");
+            this.m_copyImgTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_copyImgTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_copyImgTool.Location = new System.Drawing.Point(237, 3);
+            this.m_copyImgTool.Name = "copyImgTool";
+            this.m_copyImgTool.Size = new System.Drawing.Size(24, 24);
+            this.m_copyImgTool.TabIndex = 8;
+            this.m_copyImgTool.TabStop = false;
+            this.m_copyImgTool.ToolTipText = "复制到剪切板";
+            this.m_copyImgTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.CopyImg.png");
             // 
             // loadToDrawTool
             // 
-            this.loadImgToMSpaintTool.BackColor = System.Drawing.Color.Transparent;
-            this.loadImgToMSpaintTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.loadImgToMSpaintTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.loadImgToMSpaintTool.Location = new System.Drawing.Point(208, 3);
-            this.loadImgToMSpaintTool.Name = "loadToDrawTool";
-            this.loadImgToMSpaintTool.Size = new System.Drawing.Size(24, 24);
-            this.loadImgToMSpaintTool.TabIndex = 7;
-            this.loadImgToMSpaintTool.TabStop = false;
-            this.loadImgToMSpaintTool.ToolTipText = "导入画图工具中编辑";
-            this.loadImgToMSpaintTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.LoadToDrawTool.png");
+            this.m_loadImgToMSpaintTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_loadImgToMSpaintTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_loadImgToMSpaintTool.Location = new System.Drawing.Point(208, 3);
+            this.m_loadImgToMSpaintTool.Name = "loadToDrawTool";
+            this.m_loadImgToMSpaintTool.Size = new System.Drawing.Size(24, 24);
+            this.m_loadImgToMSpaintTool.TabIndex = 7;
+            this.m_loadImgToMSpaintTool.TabStop = false;
+            this.m_loadImgToMSpaintTool.ToolTipText = "导入画图工具中编辑";
+            this.m_loadImgToMSpaintTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.LoadToDrawTool.png");
             // 
             // saveTool
             // 
-            this.saveTool.BackColor = System.Drawing.Color.Transparent;
-            this.saveTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.saveTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.saveTool.Location = new System.Drawing.Point(179, 3);
-            this.saveTool.Name = "saveTool";
-            this.saveTool.Size = new System.Drawing.Size(24, 24);
-            this.saveTool.TabIndex = 6;
-            this.saveTool.TabStop = false;
-            this.saveTool.ToolTipText = "保存";
-            this.saveTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Save.png");
+            this.m_saveTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_saveTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_saveTool.Location = new System.Drawing.Point(179, 3);
+            this.m_saveTool.Name = "saveTool";
+            this.m_saveTool.Size = new System.Drawing.Size(24, 24);
+            this.m_saveTool.TabIndex = 6;
+            this.m_saveTool.TabStop = false;
+            this.m_saveTool.ToolTipText = "保存";
+            this.m_saveTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Save.png");
             // 
             // undoTool
             // 
-            this.undoTool.BackColor = System.Drawing.Color.Transparent;
-            this.undoTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.undoTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.undoTool.Location = new System.Drawing.Point(150, 3);
-            this.undoTool.Name = "undoTool";
-            this.undoTool.Size = new System.Drawing.Size(24, 24);
-            this.undoTool.TabIndex = 5;
-            this.undoTool.TabStop = false;
-            this.undoTool.ToolTipText = "撤销编辑";
-            this.undoTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Undo.png");
+            this.m_undoTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_undoTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_undoTool.Location = new System.Drawing.Point(150, 3);
+            this.m_undoTool.Name = "undoTool";
+            this.m_undoTool.Size = new System.Drawing.Size(24, 24);
+            this.m_undoTool.TabIndex = 5;
+            this.m_undoTool.TabStop = false;
+            this.m_undoTool.ToolTipText = "撤销编辑";
+            this.m_undoTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Undo.png");
             // 
             // textTool
             // 
-            this.textTool.BackColor = System.Drawing.Color.Transparent;
-            this.textTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.textTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.textTool.Location = new System.Drawing.Point(121, 3);
-            this.textTool.Name = "textTool";
-            this.textTool.Size = new System.Drawing.Size(24, 24);
-            this.textTool.TabIndex = 4;
-            this.textTool.TabStop = false;
-            this.textTool.ToolTipText = "文字工具";
-            this.textTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Text.png");
+            this.m_textTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_textTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_textTool.Location = new System.Drawing.Point(121, 3);
+            this.m_textTool.Name = "textTool";
+            this.m_textTool.Size = new System.Drawing.Size(24, 24);
+            this.m_textTool.TabIndex = 4;
+            this.m_textTool.TabStop = false;
+            this.m_textTool.ToolTipText = "文字工具";
+            this.m_textTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Text.png");
             // 
             // brushTool
             // 
-            this.brushTool.BackColor = System.Drawing.Color.Transparent;
-            this.brushTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.brushTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.brushTool.Location = new System.Drawing.Point(92, 3);
-            this.brushTool.Name = "brushTool";
-            this.brushTool.Size = new System.Drawing.Size(24, 24);
-            this.brushTool.TabIndex = 3;
-            this.brushTool.TabStop = false;
-            this.brushTool.ToolTipText = "画刷工具";
-            this.brushTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Brush.png");
+            this.m_brushTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_brushTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_brushTool.Location = new System.Drawing.Point(92, 3);
+            this.m_brushTool.Name = "brushTool";
+            this.m_brushTool.Size = new System.Drawing.Size(24, 24);
+            this.m_brushTool.TabIndex = 3;
+            this.m_brushTool.TabStop = false;
+            this.m_brushTool.ToolTipText = "画刷工具";
+            this.m_brushTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Brush.png");
             // 
             // arrowTool
             // 
-            this.arrowTool.BackColor = System.Drawing.Color.Transparent;
-            this.arrowTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.arrowTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.arrowTool.Location = new System.Drawing.Point(63, 3);
-            this.arrowTool.Name = "arrowTool";
-            this.arrowTool.Size = new System.Drawing.Size(24, 24);
-            this.arrowTool.TabIndex = 2;
-            this.arrowTool.TabStop = false;
-            this.arrowTool.ToolTipText = "箭头工具";
-            this.arrowTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Arrow.png");
+            this.m_arrowTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_arrowTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_arrowTool.Location = new System.Drawing.Point(63, 3);
+            this.m_arrowTool.Name = "arrowTool";
+            this.m_arrowTool.Size = new System.Drawing.Size(24, 24);
+            this.m_arrowTool.TabIndex = 2;
+            this.m_arrowTool.TabStop = false;
+            this.m_arrowTool.ToolTipText = "箭头工具";
+            this.m_arrowTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Arrow.png");
             // 
             // ellipseTool
             // 
-            this.ellipseTool.BackColor = System.Drawing.Color.Transparent;
-            this.ellipseTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.ellipseTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.ellipseTool.Location = new System.Drawing.Point(34, 3);
-            this.ellipseTool.Name = "ellipseTool";
-            this.ellipseTool.Size = new System.Drawing.Size(24, 24);
-            this.ellipseTool.TabIndex = 1;
-            this.ellipseTool.TabStop = false;
-            this.ellipseTool.ToolTipText = "椭圆工具";
-            this.ellipseTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Ellipse.png");
+            this.m_ellipseTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_ellipseTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_ellipseTool.Location = new System.Drawing.Point(34, 3);
+            this.m_ellipseTool.Name = "ellipseTool";
+            this.m_ellipseTool.Size = new System.Drawing.Size(24, 24);
+            this.m_ellipseTool.TabIndex = 1;
+            this.m_ellipseTool.TabStop = false;
+            this.m_ellipseTool.ToolTipText = "椭圆工具";
+            this.m_ellipseTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Ellipse.png");
             // 
             // rectTool
             // 
-            this.rectTool.BackColor = System.Drawing.Color.Transparent;
-            this.rectTool.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.rectTool.Font = new System.Drawing.Font("微软雅黑", 9F);
-            this.rectTool.Location = new System.Drawing.Point(5, 3);
-            this.rectTool.Name = "rectTool";
-            this.rectTool.Size = new System.Drawing.Size(24, 24);
-            this.rectTool.TabIndex = 0;
-            this.rectTool.TabStop = false;
-            this.rectTool.ToolTipText = "矩形工具";
-            this.rectTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Rectangle.png");
+            this.m_rectTool.BackColor = System.Drawing.Color.Transparent;
+            this.m_rectTool.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.m_rectTool.Location = new System.Drawing.Point(5, 3);
+            this.m_rectTool.Name = "rectTool";
+            this.m_rectTool.Size = new System.Drawing.Size(24, 24);
+            this.m_rectTool.TabIndex = 0;
+            this.m_rectTool.TabStop = false;
+            this.m_rectTool.ToolTipText = "矩形工具";
+            this.m_rectTool.Image = MethodHelper.GetImageFormResourceStream("MyControls.ShotToolBar.Res.Rectangle.png");
             // 
             // ShotToolBar
             // 
             this.ClientSize = new System.Drawing.Size(296, 30);
-            this.Controls.Add(this.exitShotTool);
-            this.Controls.Add(this.copyImgTool);
-            this.Controls.Add(this.loadImgToMSpaintTool);
-            this.Controls.Add(this.saveTool);
-            this.Controls.Add(this.undoTool);
-            this.Controls.Add(this.textTool);
-            this.Controls.Add(this.brushTool);
-            this.Controls.Add(this.arrowTool);
-            this.Controls.Add(this.ellipseTool);
-            this.Controls.Add(this.rectTool);
+            this.Controls.Add(this.m_exitShotTool);
+            this.Controls.Add(this.m_copyImgTool);
+            this.Controls.Add(this.m_loadImgToMSpaintTool);
+            this.Controls.Add(this.m_saveTool);
+            this.Controls.Add(this.m_undoTool);
+            this.Controls.Add(this.m_textTool);
+            this.Controls.Add(this.m_brushTool);
+            this.Controls.Add(this.m_arrowTool);
+            this.Controls.Add(this.m_ellipseTool);
+            this.Controls.Add(this.m_rectTool);
             this.BorderStyle = BorderStyle.None;
             this.Name = "ShotToolBar";
             this.ResumeLayout(false);
         }
 
-        private void ToolsEventIni()
-        {
-            rectTool.Click += new EventHandler(OnRectToolClick);
-            ellipseTool.Click += new EventHandler(OnEllipseToolClick);
-            arrowTool.Click += new EventHandler(OnArrowToolClick);
-            brushTool.Click += new EventHandler(OnBrushToolClick);
-            textTool.Click += new EventHandler(OnTextToolClick);
-            undoTool.Click += new EventHandler(OnUndoToolClick);
-            saveTool.Click += new EventHandler(OnSaveToolClick);
-            loadImgToMSpaintTool.Click += new EventHandler(OnLoadImgToMSpaintToolClick);
-            copyImgTool.Click += new EventHandler(OnCopyImgToolClick);
-            exitShotTool.Click += new EventHandler(OnExitToolClick);
-        }
-
-        private void OnRectToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Rect] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnEllipseToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Ellipse] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnArrowToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Arrow] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnBrushToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Brush] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnTextToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Text] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnUndoToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Undo] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnSaveToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Save] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnLoadImgToMSpaintToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_LoadImgToMSpaint] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void OnCopyImgToolClick(object sender, EventArgs e)
-        {
-            EventHandler hander = base.Events[EventObject_CopyImg] as EventHandler;
-            if (hander != null)
-                hander(this, e);
-        }
-
-        private void OnExitToolClick(object sender, EventArgs e)
-        {
-            EventHandler handler = base.Events[EventObject_Exit] as EventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
 
         #endregion
 
