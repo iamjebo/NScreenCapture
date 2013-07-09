@@ -51,14 +51,11 @@
   <ItemGroup>
     <Compile Include="Helpers\MethodHelper.cs" />
     <Compile Include="Helpers\Win32.cs" />
-    <Compile Include="Main\ScreenShot_ToolBarEventHandler.cs">
+    <Compile Include="Main\CaptureMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Main\ScreenShotForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Main\ScreenShotForm.Designer.cs">
-      <DependentUpon>ScreenShotForm.cs</DependentUpon>
+    <Compile Include="Main\CaptureMainForm.Designer.cs">
+      <DependentUpon>CaptureMainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MyControls\ColorButton\ColorButton.cs">
       <SubType>Component</SubType>
@@ -81,22 +78,26 @@
     <Compile Include="MyControls\GlassButton\GlassButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="MyControls\Separator\Res\Separator.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MyControls\WidthDotButton\WidthDotButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MyTypes\MyControlState.cs" />
-    <Compile Include="MyControls\ShotToolBar\ShotToolBar.cs">
+    <Compile Include="MyControls\CaptureToolBar\CaptureToolBar.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MyTypes\DotWidth.cs" />
     <Compile Include="MyTypes\DrawStyle.cs" />
     <Compile Include="MyTypes\MyControlColors.cs" />
     <Compile Include="MyTypes\RECT.cs" />
-    <Compile Include="MyTypes\ShotState.cs" />
+    <Compile Include="MyTypes\CaptureState.cs" />
     <Compile Include="Main\Program.cs" />
+    <Compile Include="MyTypes\ToolBarLocationFlag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Main\ScreenShotForm.resx">
-      <DependentUpon>ScreenShotForm.cs</DependentUpon>
+    <EmbeddedResource Include="Main\CaptureMainForm.resx">
+      <DependentUpon>CaptureMainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MyControls\ColorTableWithFont\ColorTableWithFont.resx">
       <DependentUpon>ColorTableWithFont.cs</DependentUpon>
@@ -132,26 +133,28 @@
     <None Include="Resources\cursor_default.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Arrow.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Brush.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Ellipse.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Exit.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Rectangle.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Save.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\SinglePoint.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Text.png" />
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\Undo.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Arrow.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Brush.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Ellipse.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Exit.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Rectangle.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Save.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\SinglePoint.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Text.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Undo.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\LoadToDrawTool.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\LoadToDrawTool.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MyControls\ShotToolBar\Res\CopyImg.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\CopyImg.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MyControls\WidthDotButton\Res\dot.png" />
     <EmbeddedResource Include="MyControls\WidthDotButton\Res\glassbtn_down.png" />
     <EmbeddedResource Include="MyControls\WidthDotButton\Res\glassbtn_hot.png" />
+    <EmbeddedResource Include="MyControls\Separator\Res\separator.png" />
+    <EmbeddedResource Include="MyControls\CaptureToolBar\Res\Finish.png" />
     <Content Include="Resources\NScreenShot.ico" />
   </ItemGroup>
   <ItemGroup />

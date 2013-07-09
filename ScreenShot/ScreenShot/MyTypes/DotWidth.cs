@@ -20,16 +20,16 @@ namespace ScreenShot
         /// <summary>
         /// 最小的宽度
         /// </summary>
-        Minimize,
+        Minimize =1,
 
         /// <summary>
         /// 中等的宽度
         /// </summary>
-        Medium,
+        Medium =3,
 
         /// <summary>
         /// 最大的宽度
         /// </summary>
-        Maximize
+        Maximize =5
     }
 }

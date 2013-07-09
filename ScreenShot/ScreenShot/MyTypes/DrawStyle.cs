@@ -7,7 +7,7 @@ namespace ScreenShot
 {
     /****************************************************************
     * 
-    *             Dcrp：ShotToolBar 绘图类型枚举
+    *             Dcrp：CaptureToolBar 绘图类型枚举
     *           Author：曹江波
     *             Blog: http://www.cnblogs.com/Keep-Silence-/
     *           Update: 2013-6-12
@@ -24,26 +24,26 @@ namespace ScreenShot
         /// <summary>
         /// 绘制矩形
         /// </summary>
-        DrawRectangle,
+        Rectangle,
 
         /// <summary>
         /// 绘制椭圆
         /// </summary>
-        DrawEllipse,
+        Ellipse,
 
         /// <summary>
         /// 绘制箭头
         /// </summary>
-        DrawArrow,
+        Arrow,
 
         /// <summary>
         /// 绘制画刷
         /// </summary>
-        DrawBrush,
+        Brush,
 
         /// <summary>
         /// 绘制文字
         /// </summary>
-        DrawText
+        Text
     }
 }

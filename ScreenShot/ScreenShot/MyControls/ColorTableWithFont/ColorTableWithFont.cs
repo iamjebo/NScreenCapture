@@ -21,19 +21,18 @@ namespace ScreenShot
 
     public partial class ColorTableWithFont : UserControl
     {
-
         /// <summary>
         /// 当前用户选择的字体宽度
         /// </summary>
         public int FontWidth
         {
-            get { return Convert.ToInt32(comboBoxFontWidth.SelectedText); }
+            get { return Convert.ToInt32(comboBoxFontWidth.Items[comboBoxFontWidth.SelectedIndex].ToString()); }
         }
 
         /// <summary>
-        /// 当前用户选择的线条颜色
+        /// 当前用户选择的字体颜色
         /// </summary>
-        public Color LineColor
+        public Color FontColor
         {
             get
             {
@@ -49,6 +48,12 @@ namespace ScreenShot
             this.Size = size;
 
             this.comboBoxFontWidth.SelectedIndex = 0;   //默认的宽度
+        }
+
+        public void Reset()
+        {
+            comboBoxFontWidth.SelectedIndex = 0;
+            colorTable.SelectColor = Color.Red;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -72,5 +77,17 @@ namespace ScreenShot
             this.Cursor = Cursors.Default;
         }
 
+        protected override CreateParams CreateParams
+        {//解决工具栏因子控件太多重绘时严重闪烁问题。
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                if (!DesignMode)
+                {
+                    cp.ExStyle |= Win32.WS_CLIPCHILDREN;
+                }
+                return cp;
+            }
+        }
     }
 }

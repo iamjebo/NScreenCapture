@@ -28,17 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.widthDotBtnMax = new WidthDotButton();
-            this.widthDotBtnMeduim = new WidthDotButton();
-            this.widthDotBtnMin = new WidthDotButton();
-            this.colorTable = new ColorTable();
+            this.separator1 = new ScreenShot.Separator();
+            this.widthDotBtnMax = new ScreenShot.WidthDotButton();
+            this.widthDotBtnMeduim = new ScreenShot.WidthDotButton();
+            this.widthDotBtnMin = new ScreenShot.WidthDotButton();
+            this.colorTable = new ScreenShot.ColorTable();
+            ((System.ComponentModel.ISupportInitialize)(this.separator1)).BeginInit();
             this.SuspendLayout();
+            // 
+            // separator1
+            // 
+            this.separator1.Location = new System.Drawing.Point(102, 6);
+            this.separator1.Name = "separator1";
+            this.separator1.Size = new System.Drawing.Size(1, 28);
+            this.separator1.TabIndex = 4;
+            this.separator1.TabStop = false;
             // 
             // widthDotBtnMax
             // 
             this.widthDotBtnMax.AutoSize = true;
             this.widthDotBtnMax.BackColor = System.Drawing.Color.Transparent;
-            this.widthDotBtnMax.DotWidth = DotWidth.Maximize;
+            this.widthDotBtnMax.DotWidth = ScreenShot.DotWidth.Maximize;
             this.widthDotBtnMax.Location = new System.Drawing.Point(74, 9);
             this.widthDotBtnMax.MinimumSize = new System.Drawing.Size(23, 23);
             this.widthDotBtnMax.Name = "widthDotBtnMax";
@@ -50,7 +60,7 @@
             // 
             this.widthDotBtnMeduim.AutoSize = true;
             this.widthDotBtnMeduim.BackColor = System.Drawing.Color.Transparent;
-            this.widthDotBtnMeduim.DotWidth = DotWidth.Medium;
+            this.widthDotBtnMeduim.DotWidth = ScreenShot.DotWidth.Medium;
             this.widthDotBtnMeduim.Location = new System.Drawing.Point(41, 9);
             this.widthDotBtnMeduim.MinimumSize = new System.Drawing.Size(23, 23);
             this.widthDotBtnMeduim.Name = "widthDotBtnMeduim";
@@ -63,7 +73,7 @@
             this.widthDotBtnMin.AutoSize = true;
             this.widthDotBtnMin.BackColor = System.Drawing.Color.Transparent;
             this.widthDotBtnMin.Checked = true;
-            this.widthDotBtnMin.DotWidth = DotWidth.Minimize;
+            this.widthDotBtnMin.DotWidth = ScreenShot.DotWidth.Minimize;
             this.widthDotBtnMin.Location = new System.Drawing.Point(8, 9);
             this.widthDotBtnMin.MinimumSize = new System.Drawing.Size(23, 23);
             this.widthDotBtnMin.Name = "widthDotBtnMin";
@@ -76,6 +86,7 @@
             // 
             this.colorTable.Location = new System.Drawing.Point(108, 2);
             this.colorTable.Name = "colorTable";
+            this.colorTable.SelectColor = System.Drawing.Color.Red;
             this.colorTable.Size = new System.Drawing.Size(177, 37);
             this.colorTable.TabIndex = 0;
             // 
@@ -83,12 +94,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.separator1);
             this.Controls.Add(this.widthDotBtnMax);
             this.Controls.Add(this.widthDotBtnMeduim);
             this.Controls.Add(this.widthDotBtnMin);
             this.Controls.Add(this.colorTable);
             this.Name = "ColorTableWithWidth";
             this.Size = new System.Drawing.Size(287, 40);
+            ((System.ComponentModel.ISupportInitialize)(this.separator1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -100,5 +113,6 @@
         private WidthDotButton widthDotBtnMin;
         private WidthDotButton widthDotBtnMeduim;
         private WidthDotButton widthDotBtnMax;
+        private Separator separator1;
     }
 }

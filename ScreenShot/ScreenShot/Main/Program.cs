@@ -16,7 +16,7 @@ namespace ScreenShot
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            ScreenShotForm capture = new ScreenShotForm();
+            CaptureMainForm capture = new CaptureMainForm();
             capture.ImageSaveFilename = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             capture.ImageSaveFilename = "Nscreenshot.jpg";
 

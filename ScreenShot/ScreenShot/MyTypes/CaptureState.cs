@@ -14,7 +14,7 @@ namespace ScreenShot
     *
     *****************************************************************/
 
-    public enum ShotState
+    public enum CaptureState
     {
         /// <summary>
         /// 无操作

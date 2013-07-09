@@ -1,10 +1,5 @@
-V0.62:
+V0.7:
 
-更改：修改GlassButton 实现单选框的效果。
-更改：使用修改后的GlassButton重新构造工具栏。
-更改：使用窗体设计器重新设计主窗体
-
-添加：ColorTable边框属性
-添加：ColorTableWithWidth控件到主窗体
-添加：ColorTableWithFont控件到主窗体
-添加：注册到主窗体的ShotToolBar事件
+增加：在选区内的绘制操作，实现工具栏的所有事件操作；
+修改：添加 Separator 自定义控件美化工具栏；
+修改：ToolBar与ColorTableWithWidth 、ColorTableWithFont的显示位置

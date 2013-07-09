@@ -26,16 +26,14 @@ namespace ScreenShot
         /// </summary>
         public DotWidth LineWidth
         {
-            get 
+            get
             {
                 if (widthDotBtnMin.Checked)
                     return DotWidth.Minimize;
                 else if (widthDotBtnMeduim.Checked)
                     return DotWidth.Medium;
-                else if (widthDotBtnMax.Checked)
-                    return DotWidth.Maximize;
                 else
-                    return DotWidth.Minimize;
+                    return DotWidth.Maximize;
             }
         }
 
@@ -58,6 +56,12 @@ namespace ScreenShot
             this.Size = size;
         }
 
+        public void Reset()
+        {
+            widthDotBtnMin.Checked = true;
+            colorTable.SelectColor = Color.Red;
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -77,6 +81,19 @@ namespace ScreenShot
         {
             base.OnMouseEnter(e);
             this.Cursor = Cursors.Default;
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                if (!DesignMode)
+                {
+                    cp.ExStyle |= Win32.WS_CLIPCHILDREN;
+                }
+                return cp;
+            }
         }
     }
 }

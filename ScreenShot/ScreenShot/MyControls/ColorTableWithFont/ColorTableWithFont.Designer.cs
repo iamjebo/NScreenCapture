@@ -29,19 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColorTableWithFont));
-            this.colorTable = new ColorTable();
             this.pictureBoxFont = new System.Windows.Forms.PictureBox();
             this.comboBoxFontWidth = new System.Windows.Forms.ComboBox();
+            this.separator1 = new ScreenShot.Separator();
+            this.colorTable = new ScreenShot.ColorTable();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFont)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.separator1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // colorTable
-            // 
-            this.colorTable.IsDrawBorder = false;
-            this.colorTable.Location = new System.Drawing.Point(108, 2);
-            this.colorTable.Name = "colorTable";
-            this.colorTable.Size = new System.Drawing.Size(177, 37);
-            this.colorTable.TabIndex = 0;
             // 
             // pictureBoxFont
             // 
@@ -59,8 +53,6 @@
             this.comboBoxFontWidth.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.comboBoxFontWidth.FormattingEnabled = true;
             this.comboBoxFontWidth.Items.AddRange(new object[] {
-            "8",
-            "9",
             "10",
             "11",
             "12",
@@ -69,22 +61,41 @@
             "18",
             "20",
             "24",
-            "36"});
+            "36",
+            "48"});
             this.comboBoxFontWidth.Location = new System.Drawing.Point(36, 8);
             this.comboBoxFontWidth.Name = "comboBoxFontWidth";
             this.comboBoxFontWidth.Size = new System.Drawing.Size(54, 25);
             this.comboBoxFontWidth.TabIndex = 2;
             // 
+            // separator1
+            // 
+            this.separator1.Location = new System.Drawing.Point(98, 7);
+            this.separator1.Name = "separator1";
+            this.separator1.Size = new System.Drawing.Size(1, 28);
+            this.separator1.TabIndex = 3;
+            this.separator1.TabStop = false;
+            // 
+            // colorTable
+            // 
+            this.colorTable.Location = new System.Drawing.Point(108, 2);
+            this.colorTable.Name = "colorTable";
+            this.colorTable.SelectColor = System.Drawing.Color.Red;
+            this.colorTable.Size = new System.Drawing.Size(177, 37);
+            this.colorTable.TabIndex = 0;
+            // 
             // ColorTableWithFont
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.separator1);
             this.Controls.Add(this.comboBoxFontWidth);
             this.Controls.Add(this.pictureBoxFont);
             this.Controls.Add(this.colorTable);
             this.Name = "ColorTableWithFont";
             this.Size = new System.Drawing.Size(287, 40);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFont)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.separator1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -94,5 +105,6 @@
         private ColorTable colorTable;
         private System.Windows.Forms.PictureBox pictureBoxFont;
         private System.Windows.Forms.ComboBox comboBoxFontWidth;
+        private Separator separator1;
     }
 }

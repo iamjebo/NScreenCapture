@@ -23,7 +23,6 @@ namespace ScreenShot
 
         private ColorButton[] m_colorsButtons = new ColorButton[16];   //2 x 8
         private ColorButton m_selectColorButton;
-        private bool m_isDrawBorder = false;                          //是否绘制边框
         private const byte m_offset = 1;
 
         #endregion
@@ -46,16 +45,9 @@ namespace ScreenShot
         public Color SelectColor
         {
             get { return m_selectColorButton.Color; }
+            set { m_selectColorButton.Color = Color.Red; }
         }
 
-        /// <summary>
-        /// 是否绘制边框
-        /// </summary>
-        public bool IsDrawBorder
-        {
-            get { return m_isDrawBorder; }
-            set { m_isDrawBorder = value; }
-        }
 
 
         #endregion
@@ -69,14 +61,6 @@ namespace ScreenShot
             using (SolidBrush sbrush = new SolidBrush(MyControlColors.BACKGROUND_COLOR))
             {
                 e.Graphics.FillRectangle(sbrush, ClientRectangle);
-                if (m_isDrawBorder)
-                {
-                    using (Pen pen = new Pen(MyControlColors.BORDER_COLOR))
-                    {
-                        e.Graphics.DrawRectangle(pen,
-                            new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1));
-                    }
-                }
             }
         }
 
