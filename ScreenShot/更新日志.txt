@@ -1,5 +1,0 @@
-V0.7:
-
-增加：在选区内的绘制操作，实现工具栏的所有事件操作；
-修改：添加 Separator 自定义控件美化工具栏；
-修改：ToolBar与ColorTableWithWidth 、ColorTableWithFont的显示位置
