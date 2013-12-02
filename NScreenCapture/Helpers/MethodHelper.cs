@@ -6,6 +6,8 @@ using System.IO;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Drawing.Imaging;
 
 namespace NScreenCapture.Helpers
 {
@@ -20,6 +22,10 @@ namespace NScreenCapture.Helpers
     *
     *****************************************************************/
 
+
+    /// <summary>
+    /// 静态方法帮助类，封装了常用的方法。
+    /// </summary>
     internal class MethodHelper
     {
         /// <summary>
@@ -32,6 +38,43 @@ namespace NScreenCapture.Helpers
                 Color color = bmp.GetPixel(x,y);
                 return color;
             }
+        }
+
+        /// <summary>
+        /// 将图片按照指定的倍数放大
+        /// </summary>
+        /// <param name="bmpSrc">需要放大的图片</param>
+        /// <param name="times">放到的倍数</param>
+        public static Bitmap MagnifyImage(Bitmap bmpSrc, int times)
+        {
+            Bitmap bmpNew = new Bitmap(bmpSrc.Width * times, bmpSrc.Height * times, PixelFormat.Format32bppArgb);
+            BitmapData bmpSrcData = bmpSrc.LockBits(new Rectangle(0, 0, bmpSrc.Width, bmpSrc.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData bmpNewData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte[] bySrcData = new byte[bmpSrcData.Height * bmpSrcData.Stride];
+            Marshal.Copy(bmpSrcData.Scan0, bySrcData, 0, bySrcData.Length);
+            byte[] byNewData = new byte[bmpNewData.Height * bmpNewData.Stride];
+            Marshal.Copy(bmpNewData.Scan0, byNewData, 0, byNewData.Length);
+
+            for (int y = 0, lenY = bmpSrc.Height; y < lenY; y++)
+            {
+                for (int x = 0, lenX = bmpSrc.Width; x < lenX; x++)
+                {
+                    for (int cy = 0; cy < times; cy++)
+                    {
+                        for (int cx = 0; cx < times; cx++)
+                        {
+                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride)] = bySrcData[x * 4 + y * bmpSrcData.Stride];
+                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride) + 1] = bySrcData[x * 4 + y * bmpSrcData.Stride + 1];
+                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride) + 2] = bySrcData[x * 4 + y * bmpSrcData.Stride + 2];
+                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride) + 3] = bySrcData[x * 4 + y * bmpSrcData.Stride + 3];
+                        }
+                    }
+                }
+            }
+            Marshal.Copy(byNewData, 0, bmpNewData.Scan0, byNewData.Length);
+            bmpSrc.UnlockBits(bmpSrcData);
+            bmpNew.UnlockBits(bmpNewData);
+            return bmpNew;
         }
 
         /// <summary>

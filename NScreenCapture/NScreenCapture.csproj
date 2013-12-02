@@ -87,7 +87,7 @@
     <Compile Include="Controls\WidthDotButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Types\MouseOperateFlag.cs" />
+    <Compile Include="Types\MouseEditFlag.cs" />
     <Compile Include="Types\MyControlState.cs" />
     <Compile Include="Controls\CaptureToolBar.cs">
       <SubType>Component</SubType>

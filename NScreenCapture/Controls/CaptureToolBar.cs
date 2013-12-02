@@ -42,16 +42,50 @@ namespace NScreenCapture.Controls
 
         #region Properity
 
-        public GlassButton RectangleTool { get { return m_rectangleTool; } }
-        public GlassButton EllipseTool { get { return m_ellipseTool; } }
-        public GlassButton ArrowTool { get { return m_arrowTool; } }
-        public GlassButton BrushTool { get { return m_brushTool; } }
-        public GlassButton TextTool { get { return m_textTool; } }
-        public GlassButton UndoTool { get { return m_undoTool; } }
-        public GlassButton SaveTool { get { return m_saveTool; } }
-        public GlassButton LoadImgToMSpaintTool { get { return m_loadImgToMSpaintTool; } }
-        public GlassButton ExitCaptureTool { get { return m_exitCaptureTool; } }
-        public GlassButton FinishCaptureTool { get { return m_finishCaptureTool; } }
+        /// <summary>矩形工具是否被按下</summary>
+        public bool IsRectangleToolDown { get { return m_rectangleTool.IsDown; } }
+
+        /// <summary>椭圆工具是否被按下</summary>
+        public bool IsEllipseToolDown { get { return m_ellipseTool.IsDown; } }
+
+        /// <summary>箭头工具是否被按下</summary>
+        public bool IsArrowToolDown { get { return m_arrowTool.IsDown; } }
+
+        /// <summary>画刷工具是否被按下</summary>
+        public bool IsBrushToolDown { get { return m_brushTool.IsDown; } }
+
+        /// <summary>文字工具是否被按下</summary>
+        public bool IsTextToolDown { get { return m_textTool.IsDown; } }
+
+        /// <summary>撤销工具是否被按下</summary>
+        public bool IsUndoToolDown { get { return m_undoTool.IsDown; } }
+
+        /// <summary>保存工具是否被按下</summary>
+        public bool IsSaveToolDown { get { return m_saveTool.IsDown; } }
+
+        /// <summary>导入图片到画图中工具是否被按下</summary>
+        public bool IsLoadImgToMSpaintToolDown { get { return m_loadImgToMSpaintTool.IsDown; } }
+
+        /// <summary>退出截图工具是否被按下</summary>
+        public bool IsExitCaptureToolDown { get { return m_exitCaptureTool.IsDown; } }
+
+        /// <summary>完成截图工具是否被按下</summary>
+        public bool IsFinishCaptureToolDown { get { return m_finishCaptureTool.IsDown; } }
+
+        #endregion
+
+        #region Event
+
+        public event EventHandler OnRectangleToolClick;
+        public event EventHandler OnEllipseToolClick;
+        public event EventHandler OnArrowToolClick;
+        public event EventHandler OnBrushToolClick;
+        public event EventHandler OnTextToolClick;
+        public event EventHandler OnUndoToolClick;
+        public event EventHandler OnSaveToolClick;
+        public event EventHandler OnLoadImgToMSpaintToolClick;
+        public event EventHandler OnExitCaptureToolClick;
+        public event EventHandler OnFinishCaptureToolClick;
 
         #endregion
 
@@ -59,7 +93,8 @@ namespace NScreenCapture.Controls
 
         public CaptureToolBar()
         {
-            ShotToolBarIni();
+            ToolsProperiyIni();
+            ToolsEventIni();
         }
 
         #endregion
@@ -103,14 +138,9 @@ namespace NScreenCapture.Controls
 
         #region Private
 
-        private void ShotToolBarIni()
+        private void ToolsProperiyIni()
         {
-            ToolsIni();
-        }
 
-        private void ToolsIni()
-        {
-            
             this.m_rectangleTool = new GlassButton();
             this.m_ellipseTool = new GlassButton();
             this.m_arrowTool = new GlassButton();
@@ -284,6 +314,20 @@ namespace NScreenCapture.Controls
             this.BorderStyle = BorderStyle.None;
             this.Name = "CaptureToolBar";
             this.ResumeLayout(false);
+        }
+
+        private void ToolsEventIni()
+        {
+            m_rectangleTool.Click += delegate(object sender, EventArgs e) { OnRectangleToolClick(sender, e); };
+            m_ellipseTool.Click += delegate(object sender, EventArgs e) { OnEllipseToolClick(sender, e); };
+            m_arrowTool.Click += delegate(object sender, EventArgs e) { OnArrowToolClick(sender, e); };
+            m_brushTool.Click += delegate(object sender, EventArgs e) { OnBrushToolClick(sender, e); };
+            m_textTool.Click += delegate(object sender, EventArgs e) { OnTextToolClick(sender, e); };
+            m_undoTool.Click += delegate(object sender, EventArgs e) { OnUndoToolClick(sender, e); };
+            m_saveTool.Click += delegate(object sender, EventArgs e) { OnSaveToolClick(sender, e); };
+            m_loadImgToMSpaintTool.Click += delegate(object sender, EventArgs e) { OnLoadImgToMSpaintToolClick(sender, e); };
+            m_exitCaptureTool.Click += delegate(object sender, EventArgs e) { OnExitCaptureToolClick(sender, e); };
+            m_finishCaptureTool.Click += delegate(object sender, EventArgs e) { OnFinishCaptureToolClick(sender, e); };
         }
 
 

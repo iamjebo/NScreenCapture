@@ -17,6 +17,19 @@ namespace NScreenCapture.Types
 
     internal enum ToolBarLocationFlag
     {
+
+
+        /*              5                           1       
+         *              *****************************
+         *              *                         2 *
+         *              *                           *
+         *              *                           *
+         *              *                           *
+         *              *****************************
+         *              4                           3
+         *  
+         */
+
         /// <summary>
         /// 位于选区右上角的外部
         /// </summary>
@@ -42,18 +55,4 @@ namespace NScreenCapture.Types
         /// </summary>
         LeftTop_Outer = 5
     }
-
-
-    /*              5                           1       
-     *              *****************************
-     *              *                         2 *
-     *              *                           *
-     *              *                           *
-     *              *                           *
-     *              *****************************
-     *              4                           3
-     *  
-     */
-
-
 }

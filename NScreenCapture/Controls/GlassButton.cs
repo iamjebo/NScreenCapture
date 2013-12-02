@@ -24,7 +24,7 @@ namespace NScreenCapture.Controls
 
     internal class GlassButton : RadioButton
     {
-        #region  Fileds
+        #region  Filed
 
         private bool m_holdingSpace = false;
 
@@ -39,24 +39,9 @@ namespace NScreenCapture.Controls
 
         #endregion
 
-        #region Constructor
+        #region  Property
 
-        public GlassButton()
-        {
-            m_glassHotImg = Properties.Resources.Glassbtn_hot ;
-            m_glassDownImg = Properties.Resources.Glassbtn_down;
-            m_defaultFont = new Font("微软雅黑", 9);
-            m_toolTip = new ToolTip();
-
-            this.BackColor = Color.Transparent;
-            this.Size = new Size(75, 23);
-            this.Font = m_defaultFont;
-        }
-
-        #endregion
-
-        #region  Properties
-
+        /// <summary> 按钮是否处于按下状态 </summary>
         public bool IsDown { get { return m_isDown; } }
 
         [Browsable(true)]
@@ -93,6 +78,22 @@ namespace NScreenCapture.Controls
 
         [Description("当鼠标放在控件可见处的提示文本")]
         public string ToolTipText { get; set; }
+
+        #endregion
+
+        #region Constructor
+
+        public GlassButton()
+        {
+            m_glassHotImg = Properties.Resources.Glassbtn_hot ;
+            m_glassDownImg = Properties.Resources.Glassbtn_down;
+            m_defaultFont = new Font("微软雅黑", 9);
+            m_toolTip = new ToolTip();
+
+            this.BackColor = Color.Transparent;
+            this.Size = new Size(75, 23);
+            this.Font = m_defaultFont;
+        }
 
         #endregion
 

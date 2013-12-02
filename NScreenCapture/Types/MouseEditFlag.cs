@@ -7,9 +7,9 @@ using System.Windows.Forms;
 namespace NScreenCapture.Types
 {
     /// <summary>
-    /// 鼠标操作枚举：0-7：调整大小  8：移动  9：默认
+    /// 鼠标编辑操作枚举：0-7：调整大小  8：移动  9：默认
     /// </summary>
-    internal enum MouseOperateFlag
+    internal enum MouseEditFlag
     {
 
         //0-7：调整大小  8：移动  9：默认

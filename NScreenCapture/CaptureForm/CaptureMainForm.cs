@@ -41,7 +41,7 @@ namespace NScreenCapture.CaptureForm
         private Point m_startPoint;                             //第一次创建选区鼠标起点
         private Rectangle m_selectRect;                         //选区
 
-        private MouseOperateFlag m_mouseOperateFlag;            //编辑标记：0-7：调整大小  8：默认  9：移动
+        private MouseEditFlag m_mouseEditFlag;                  //鼠标编辑标记
 
         // 与选区绘制操作有关的字段
         private DrawStyle m_drawStyle = DrawStyle.None;         //绘制类型
@@ -112,7 +112,7 @@ namespace NScreenCapture.CaptureForm
                 else if (m_captureState == CaptureState.FinishedRect) //调整大小
                 {
                     m_captureState = CaptureState.ResizingRect;
-                    m_mouseOperateFlag = GetMouseOperateFlag(e.Location);
+                    m_mouseEditFlag = GetMouseEditFlag(e.Location);
                 }
                 else if (m_captureState == CaptureState.DrawInRect)   //在选区绘制图形
                 {
@@ -150,14 +150,13 @@ namespace NScreenCapture.CaptureForm
             else if (m_captureState == CaptureState.ResizingRect)
             {
                 if (m_UpdatedSelectImgList.Count == 0)    //未在选区内绘制图形可移动和调整选区
-                    ResizeSelectRect(m_mouseOperateFlag, e.Location);
+                    EditSelectRect(m_mouseEditFlag, e.Location);
             }
             else if (m_captureState == CaptureState.DrawInRect)
             {
                 if (m_isStartDraw)
                 {
                     m_endDrawPoint = e.Location;
-                    SetEndPointBounds(ref m_endDrawPoint, m_selectRect);
 
                     if (m_drawStyle == DrawStyle.Brush)
                         m_brushPointList.Add(m_endDrawPoint);
@@ -193,7 +192,6 @@ namespace NScreenCapture.CaptureForm
                     {
                         m_isStartDraw = false;
                         m_endDrawPoint = e.Location;
-                        SetEndPointBounds(ref m_endDrawPoint, m_selectRect);
 
                         if (m_drawStyle != DrawStyle.Text)
                             AddImgToUpdatedSelectImgList(false);
@@ -288,14 +286,15 @@ namespace NScreenCapture.CaptureForm
             InitializeComponent();
             FieldAndFormIni();
             TextBoxEventIni();
-            ToolBarEventsIni();
+            ToolBarEventIni();
             RegisterHotkeys();
         }
 
         #endregion
 
-        #region Private Draw Method
+        #region Draw Method
 
+        /// <summary>绘制自动选框矩形</summary>
         private void DrawAutoSelectRect(Graphics g)
         {
             if (m_autoRect != Rectangle.Empty)
@@ -313,13 +312,18 @@ namespace NScreenCapture.CaptureForm
 
         }
 
+        /// <summary>绘制自定义选区矩形</summary>
         private void DrawCustomeSelectRect(Graphics g)
         {
             if (m_selectRect != Rectangle.Empty)
             {
-                SetSelectRectBounds();
+                // 限制选区不能超过窗体边界
+                if (m_selectRect.X < 0) { m_selectRect.X = 0; }
+                if (m_selectRect.Y < 0) { m_selectRect.Y = 0; }
+                if (m_selectRect.Right > ClientSize.Width) { m_selectRect.X = ClientSize.Width - m_selectRect.Width - 1; }
+                if (m_selectRect.Bottom > ClientSize.Height) { m_selectRect.Y = ClientSize.Height - m_selectRect.Height - 1; }
 
-                //draw image in selected rectangle
+                // draw image in selected rectangle
                 if (m_UpdatedSelectImgList.Count == 0)
                 {
                     g.DrawImage(m_screenImg, m_selectRect, m_selectRect, GraphicsUnit.Pixel);
@@ -333,35 +337,35 @@ namespace NScreenCapture.CaptureForm
                     GraphicsUnit.Pixel);
                 }
 
+                // draw select rectangle border
                 DrawSelectRectBorder(g);
             }
         }
 
+        /// <summary>绘制自定义选区矩形边框与结点</summary>
         private void DrawSelectRectBorder(Graphics g)
         {
-            //绘制选区矩形与结点
             using (Pen redPen = new Pen(DrawArgsManager.LINE_COLOR_AUTO, DrawArgsManager.LINE_WIDTH_CUSTOM))
             {
                 g.DrawRectangle(redPen, m_selectRect);
 
                 Point[] rectNodes = GetRectNodes(m_selectRect);
-                if (rectNodes != null)
+                using (SolidBrush redBrush = new SolidBrush(DrawArgsManager.LINE_COLOR_AUTO))
                 {
-                    using (SolidBrush redBrush = new SolidBrush(DrawArgsManager.LINE_COLOR_AUTO))
-                    {
-                        foreach (Point node in rectNodes)
-                            g.FillRectangle(
-                                redBrush,
-                                new Rectangle(
-                                    node.X - DrawArgsManager.LINE_NODE_WIDTH,
-                                    node.Y - DrawArgsManager.LINE_NODE_WIDTH,
-                                    2 * DrawArgsManager.LINE_NODE_WIDTH,
-                                    2 * DrawArgsManager.LINE_NODE_WIDTH));
-                    }
+                    foreach (Point node in rectNodes)
+                        g.FillRectangle(
+                            redBrush,
+                            new Rectangle(
+                                node.X - DrawArgsManager.LINE_NODE_WIDTH,
+                                node.Y - DrawArgsManager.LINE_NODE_WIDTH,
+                                2 * DrawArgsManager.LINE_NODE_WIDTH,
+                                2 * DrawArgsManager.LINE_NODE_WIDTH));
                 }
+
             }
         }
 
+        /// <summary>绘制选区矩形左上角的选区大小信息框</summary>
         private void DrawSelectRectInfo(Graphics g)
         {
             if (m_selectRect != Rectangle.Empty)
@@ -394,6 +398,7 @@ namespace NScreenCapture.CaptureForm
             }
         }
 
+        /// <summary>绘制鼠标右下方的移动信息框</summary>
         private void DrawMouseMoveInfo(Graphics g)
         {
             if (m_captureState == CaptureState.None ||
@@ -440,7 +445,7 @@ namespace NScreenCapture.CaptureForm
                         }
 
                         //绘制放大后的图
-                        using (Bitmap bmpMagnified = MagnifyImage(bmpSrc, 4))
+                        using (Bitmap bmpMagnified = MethodHelper.MagnifyImage(bmpSrc, 4))
                         {
                             g.DrawImage(
                                 bmpMagnified,
@@ -510,11 +515,19 @@ namespace NScreenCapture.CaptureForm
             }
         }
 
+        /// <summary>绘制矩形、画刷等操作</summary>
         private void DrawOperateion(Graphics g, bool isOffset)
         {
             //如果直接在窗体上绘制的话不需要偏移，
             //如果在选区图片所建的DC上绘制的话需要偏移
             //因此绘制临时的操作不需要偏移，而把操作添加到选区图片上的话需要偏移
+
+            //限制绘制的操作在选区内，减1是为了防止右边缘和底边缘线条绘制不出来。
+            if (m_endDrawPoint.X < m_selectRect.X) { m_endDrawPoint.X = m_selectRect.X; };
+            if (m_endDrawPoint.X > m_selectRect.Right - 1) { m_endDrawPoint.X = m_selectRect.Right - 1; }
+            if (m_endDrawPoint.Y < m_selectRect.Y) { m_endDrawPoint.Y = m_selectRect.Y; }
+            if (m_endDrawPoint.Y > m_selectRect.Bottom - 1) { m_endDrawPoint.Y = m_selectRect.Bottom - 1; }
+
             Rectangle rect = new RECT(m_startDrawPoint, m_endDrawPoint).ToRectangle();
             if (isOffset)
             {
@@ -577,8 +590,9 @@ namespace NScreenCapture.CaptureForm
 
         #endregion
 
-        #region Private
+        #region Private Method
 
+        /// <summary>字段与窗体属性初始化</summary>
         private void FieldAndFormIni()
         {
             //字段初始化
@@ -586,7 +600,7 @@ namespace NScreenCapture.CaptureForm
             m_screenImgWithMask = GetScreenImgWithMask();
             m_selectRect = Rectangle.Empty;
             m_captureState = CaptureState.None;
-            m_mouseOperateFlag = MouseOperateFlag.Defalut;
+            m_mouseEditFlag = MouseEditFlag.Defalut;
             m_UpdatedSelectImgList = new List<Bitmap>();
             m_brushPointList = new List<Point>();
             m_windowListManager = new WindowsListManager();
@@ -612,35 +626,11 @@ namespace NScreenCapture.CaptureForm
             this.Cursor = new Cursor(Properties.Resources.cursor_default.Handle);
         }
 
-        private Bitmap GetOriginalScreenImg()
-        {
-            Rectangle bounds = Screen.PrimaryScreen.Bounds;
-            Bitmap screenBmp = new Bitmap(bounds.Width, bounds.Height);
-            using (Graphics g = Graphics.FromImage(screenBmp))
-            {
-                g.CopyFromScreen(Point.Empty, Point.Empty, bounds.Size);
-            }
-            return screenBmp;
-        }
-
-        private Bitmap GetScreenImgWithMask()
-        {
-            Bitmap sceenMaskImg = new Bitmap(m_screenImg);
-            using (Graphics g = Graphics.FromImage(sceenMaskImg))
-            {
-                using (SolidBrush maskBrush = new SolidBrush(Color.FromArgb(DrawArgsManager.SCREEN_ALPHA, 0, 0, 0)))
-                {
-                    g.FillRectangle(maskBrush, 0, 0, sceenMaskImg.Width, sceenMaskImg.Height);
-                    return sceenMaskImg;
-                }
-            }
-        }
-
-        // 清除所有的屏幕截图操作，还原最开始的状态 
+        /// <summary>清除所有的屏幕截图操作，还原最开始的状态 </summary>
         private void ClearScreen()
         {
             m_captureState = CaptureState.None;
-            m_mouseOperateFlag = MouseOperateFlag.Defalut;
+            m_mouseEditFlag = MouseEditFlag.Defalut;
             m_autoRect = Rectangle.Empty;
             m_selectRect = Rectangle.Empty;
             m_drawStyle = DrawStyle.None;
@@ -660,11 +650,35 @@ namespace NScreenCapture.CaptureForm
             this.Invalidate();
         }
 
-        // 获取选区矩形8个控制点
+        /// <summary>获取不带遮罩层的屏幕截图</summary>
+        private Bitmap GetOriginalScreenImg()
+        {
+            Rectangle bounds = Screen.PrimaryScreen.Bounds;
+            Bitmap screenBmp = new Bitmap(bounds.Width, bounds.Height);
+            using (Graphics g = Graphics.FromImage(screenBmp))
+            {
+                g.CopyFromScreen(Point.Empty, Point.Empty, bounds.Size);
+            }
+            return screenBmp;
+        }
+
+        /// <summary>获取带有遮罩层的屏幕截图</summary>
+        private Bitmap GetScreenImgWithMask()
+        {
+            Bitmap sceenMaskImg = new Bitmap(m_screenImg);
+            using (Graphics g = Graphics.FromImage(sceenMaskImg))
+            {
+                using (SolidBrush maskBrush = new SolidBrush(Color.FromArgb(DrawArgsManager.SCREEN_ALPHA, 0, 0, 0)))
+                {
+                    g.FillRectangle(maskBrush, 0, 0, sceenMaskImg.Width, sceenMaskImg.Height);
+                    return sceenMaskImg;
+                }
+            }
+        }
+
+        /// <summary>获取指定矩形的8个控制节点</summary>
         private Point[] GetRectNodes(Rectangle rect)
         {
-            if (rect == Rectangle.Empty) { return null; }
-
             Point[] nodes = new Point[8];
             nodes[0] = rect.Location;
             nodes[1] = new Point(rect.Left, rect.Top + (rect.Bottom - rect.Top) / 2);
@@ -677,42 +691,38 @@ namespace NScreenCapture.CaptureForm
             return nodes;
         }
 
-
-
-        private MouseOperateFlag GetMouseOperateFlag(Point mousePt)
+        /// <summary>根据鼠标的位置获取鼠标编辑标记</summary>
+        private MouseEditFlag GetMouseEditFlag(Point mousePt)
         {
             // 初始化
-            MouseOperateFlag flag = MouseOperateFlag.Defalut;
+            MouseEditFlag flag = MouseEditFlag.Defalut;
 
             if (m_selectRect.Contains(mousePt))
-                flag = MouseOperateFlag.SizeAll;
+                flag = MouseEditFlag.SizeAll;
             else
-                flag = MouseOperateFlag.Defalut;
+                flag = MouseEditFlag.Defalut;
 
             Point[] rectNodes = GetRectNodes(m_selectRect);
-            if (rectNodes != null)
+            for (int i = 0; i < rectNodes.Length; i++)
             {
-                for (int i = 0; i < rectNodes.Length; i++)
+                Rectangle nodeRect = new Rectangle(rectNodes[i].X - DrawArgsManager.LINE_NODE_WIDTH,
+                                                   rectNodes[i].Y - DrawArgsManager.LINE_NODE_WIDTH,
+                                                   2 * DrawArgsManager.LINE_NODE_WIDTH,
+                                                   2 * DrawArgsManager.LINE_NODE_WIDTH);
+                if (nodeRect.Contains(mousePt))
                 {
-                    Rectangle nodeRect = new Rectangle(rectNodes[i].X - DrawArgsManager.LINE_NODE_WIDTH,
-                                                       rectNodes[i].Y - DrawArgsManager.LINE_NODE_WIDTH,
-                                                       2 * DrawArgsManager.LINE_NODE_WIDTH,
-                                                       2 * DrawArgsManager.LINE_NODE_WIDTH);
-                    if (nodeRect.Contains(mousePt))
-                    {
-                        flag = (MouseOperateFlag)i;
-                        break;
-                    }
+                    flag = (MouseEditFlag)i;
+                    break;
                 }
-            }
 
-            //SetCursor();
+            }
             return flag;
         }
 
+        /// <summary>设置窗体的鼠标图像</summary>
         private void SetCursor()
         {
-            MouseOperateFlag flag = GetMouseOperateFlag(Cursor.Position);
+            MouseEditFlag flag = GetMouseEditFlag(Cursor.Position);
 
             if (m_selectRect.Contains(Cursor.Position) && m_captureState == CaptureState.DrawInRect)
             {
@@ -738,32 +748,7 @@ namespace NScreenCapture.CaptureForm
             this.Cursor = cur;
         }
 
-        // 限制选区不能超过窗体边界 
-        private void SetSelectRectBounds()
-        {
-            if (m_selectRect.X < 0)
-                m_selectRect.X = 0;
-            if (m_selectRect.Y < 0)
-                m_selectRect.Y = 0;
-            if (m_selectRect.Right > ClientSize.Width)
-                m_selectRect.X = ClientSize.Width - m_selectRect.Width - 1;
-            if (m_selectRect.Bottom > ClientSize.Height)
-                m_selectRect.Y = ClientSize.Height - m_selectRect.Height - 1;
-        }
-
-        // 限制鼠标移动的范围边界
-        private void SetEndPointBounds(ref Point mousePoint, Rectangle bounds)
-        {
-            if (mousePoint.X < bounds.X)
-                mousePoint.X = bounds.X;
-            if (mousePoint.X > bounds.Right - 1)     //减1是为了防止右边缘和底边缘线条绘制不出来。
-                mousePoint.X = bounds.Right - 1;
-            if (mousePoint.Y < bounds.Y)
-                mousePoint.Y = bounds.Y;
-            if (mousePoint.Y > bounds.Bottom - 1)
-                mousePoint.Y = bounds.Bottom - 1;
-        }
-
+        /// <summary> 根据偏移量移动选区 </summary>
         private void MoveSelectRect(int x, int y)
         {
             if (m_selectRect != Rectangle.Empty &&
@@ -774,7 +759,8 @@ namespace NScreenCapture.CaptureForm
             }
         }
 
-        private void ResizeSelectRect(MouseOperateFlag flag, Point curPos)
+        /// <summary> 根据鼠标编辑标记对选区进行编辑 </summary>
+        private void EditSelectRect(MouseEditFlag flag, Point curPos)
         {
             //0-7：调整大小  8：移动  9：默认
 
@@ -793,85 +779,51 @@ namespace NScreenCapture.CaptureForm
 
             switch (flag)
             {
-                case MouseOperateFlag.WestNorth:
+                case MouseEditFlag.WestNorth:
                     m_selectRect = new RECT(curPos,
                                               rectEx.BottomRight).ToRectangle();
                     break;
-                case MouseOperateFlag.West:
+                case MouseEditFlag.West:
                     m_selectRect = new RECT(new Point(curPos.X, rectEx.Top),
                                               rectEx.BottomRight).ToRectangle();
                     break;
-                case MouseOperateFlag.WestSouth:
+                case MouseEditFlag.WestSouth:
                     m_selectRect = new RECT(new Point(curPos.X, rectEx.Top),
                                               new Point(rectEx.Right, curPos.Y)).ToRectangle();
                     break;
-                case MouseOperateFlag.South:
+                case MouseEditFlag.South:
                     m_selectRect = new RECT(rectEx.TopLeft,
                                               new Point(rectEx.Right, curPos.Y)).ToRectangle();
                     break;
-                case MouseOperateFlag.EastSouth:
+                case MouseEditFlag.EastSouth:
                     m_selectRect = new RECT(rectEx.TopLeft, curPos).ToRectangle();
                     break;
-                case MouseOperateFlag.East:
+                case MouseEditFlag.East:
                     m_selectRect = new RECT(rectEx.TopLeft, new Point(curPos.X, rectEx.Bottom)).ToRectangle();
                     break;
-                case MouseOperateFlag.EastNorth:
+                case MouseEditFlag.EastNorth:
                     m_selectRect = new RECT(new Point(rectEx.Left, curPos.Y),
                                               new Point(curPos.X, rectEx.Bottom)).ToRectangle();
                     break;
-                case MouseOperateFlag.North:
+                case MouseEditFlag.North:
                     {
                         m_selectRect = new RECT(new Point(rectEx.Left, curPos.Y),
                                                   rectEx.BottomRight).ToRectangle();
                     }
                     break;
-                case MouseOperateFlag.SizeAll:
+                case MouseEditFlag.SizeAll:
                     MoveSelectRect(curPos.X - m_startPoint.X, curPos.Y - m_startPoint.Y);
                     m_startPoint.X = curPos.X;
                     m_startPoint.Y = curPos.Y;
                     break;
-                case MouseOperateFlag.Defalut:
+                case MouseEditFlag.Defalut:
                     break;
             }
 
             this.Invalidate();
         }
 
-        //将图片按照指定的倍数放大
-        private Bitmap MagnifyImage(Bitmap bmpSrc, int times)
-        {
-            Bitmap bmpNew = new Bitmap(bmpSrc.Width * times, bmpSrc.Height * times, PixelFormat.Format32bppArgb);
-            BitmapData bmpSrcData = bmpSrc.LockBits(new Rectangle(0, 0, bmpSrc.Width, bmpSrc.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            BitmapData bmpNewData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            byte[] bySrcData = new byte[bmpSrcData.Height * bmpSrcData.Stride];
-            Marshal.Copy(bmpSrcData.Scan0, bySrcData, 0, bySrcData.Length);
-            byte[] byNewData = new byte[bmpNewData.Height * bmpNewData.Stride];
-            Marshal.Copy(bmpNewData.Scan0, byNewData, 0, byNewData.Length);
-
-            for (int y = 0, lenY = bmpSrc.Height; y < lenY; y++)
-            {
-                for (int x = 0, lenX = bmpSrc.Width; x < lenX; x++)
-                {
-                    for (int cy = 0; cy < times; cy++)
-                    {
-                        for (int cx = 0; cx < times; cx++)
-                        {
-                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride)] = bySrcData[x * 4 + y * bmpSrcData.Stride];
-                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride) + 1] = bySrcData[x * 4 + y * bmpSrcData.Stride + 1];
-                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride) + 2] = bySrcData[x * 4 + y * bmpSrcData.Stride + 2];
-                            byNewData[(x * times + cx) * 4 + ((y * times + cy) * bmpNewData.Stride) + 3] = bySrcData[x * 4 + y * bmpSrcData.Stride + 3];
-                        }
-                    }
-                }
-            }
-            Marshal.Copy(byNewData, 0, bmpNewData.Scan0, byNewData.Length);
-            bmpSrc.UnlockBits(bmpSrcData);
-            bmpNew.UnlockBits(bmpNewData);
-            return bmpNew;
-        }
-
-
-
+        /// <summary> 注册系统热键 </summary>
         private void RegisterHotkeys()
         {
             m_hotkey = new HotKey(this.Handle);
@@ -912,7 +864,7 @@ namespace NScreenCapture.CaptureForm
             HotkeyEventHandler upSizeHandler = delegate()
             {
                 if (m_selectRect.Y > 0)  //上边界禁止调整大小
-                    ResizeSelectRect(MouseOperateFlag.North, new Point(m_selectRect.X, m_selectRect.Y - 1));
+                    EditSelectRect(MouseEditFlag.North, new Point(m_selectRect.X, m_selectRect.Y - 1));
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Up, upSizeHandler);
 
@@ -920,7 +872,7 @@ namespace NScreenCapture.CaptureForm
             HotkeyEventHandler downSizeHandler = delegate()
             {
                 if (m_selectRect.Bottom < Height)
-                    ResizeSelectRect(MouseOperateFlag.South, new Point(m_selectRect.X, m_selectRect.Bottom + 1));
+                    EditSelectRect(MouseEditFlag.South, new Point(m_selectRect.X, m_selectRect.Bottom + 1));
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Down, downSizeHandler);
 
@@ -928,7 +880,7 @@ namespace NScreenCapture.CaptureForm
             HotkeyEventHandler leftSizeHandler = delegate()
             {
                 if (m_selectRect.X > 0)
-                    ResizeSelectRect(MouseOperateFlag.West, new Point(m_selectRect.X - 1, m_selectRect.Y));
+                    EditSelectRect(MouseEditFlag.West, new Point(m_selectRect.X - 1, m_selectRect.Y));
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Left, leftSizeHandler);
 
@@ -936,18 +888,203 @@ namespace NScreenCapture.CaptureForm
             HotkeyEventHandler rightSizeHandler = delegate()
             {
                 if (m_selectRect.Right < Width)
-                    ResizeSelectRect(MouseOperateFlag.East, new Point(m_selectRect.Right + 1, m_selectRect.Y));
+                    EditSelectRect(MouseEditFlag.East, new Point(m_selectRect.Right + 1, m_selectRect.Y));
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Right, rightSizeHandler);
         }
 
+        /// <summary> 卸载已经注册的系统热键 </summary>
         private void UnregisterHotkeys()
         {
-            m_hotkey.UnregisterHotKeys();
+            if (m_hotkey != null) { m_hotkey.UnregisterHotKeys(); }
         }
 
+        /// <summary> 获取屏幕原始选区截图</summary>
+        private Bitmap GetBaseSelectImg()
+        {
+            if (m_selectRect.Size != Size.Empty)
+            {
+                Bitmap baseSelectImg = new Bitmap(m_selectRect.Width, m_selectRect.Height);
+                Graphics g = Graphics.FromImage(baseSelectImg);
+                g.DrawImage(
+                    m_screenImg,
+                    new Rectangle(Point.Empty, baseSelectImg.Size),
+                    m_selectRect,
+                    GraphicsUnit.Pixel);
 
+                return baseSelectImg;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
+        /// <summary> 获取最终结果截图</summary>
+        private Bitmap GetResultImg()
+        {
+            if (m_UpdatedSelectImgList.Count == 0)
+            {
+                return GetBaseSelectImg();
+            }
+            else
+            {
+                return m_UpdatedSelectImgList[m_UpdatedSelectImgList.Count - 1];
+            }
+        }
+
+        /// <summary> 保存截图</summary>
+        private bool SaveResultImg()
+        {
+            bool isSucceed = false;
+            using (SaveFileDialog saveDialog = new SaveFileDialog())
+            {
+                saveDialog.InitialDirectory = m_resultImgDefaultSavePath;
+                saveDialog.FileName = m_resultImgFileName;
+                saveDialog.AddExtension = true;
+                saveDialog.Filter = "BMP|*.bmp|PNG|*.png|GIF|*.gif|JPEG|*.jpg;*.jgeg";
+                saveDialog.DefaultExt = "png";
+                saveDialog.FilterIndex = 2;
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    int length = saveDialog.FileName.Length;
+                    string extion = saveDialog.FileName.Substring(length - 3, 3).ToLower();
+                    ImageFormat format;
+                    switch (extion)
+                    {
+                        case "bmp":
+                            format = ImageFormat.Bmp;
+                            break;
+                        case "png":
+                            format = ImageFormat.Png;
+                            break;
+                        case "gif":
+                            format = ImageFormat.Gif;
+                            break;
+                        case "jpg":
+                            format = ImageFormat.Jpeg;
+                            break;
+                        default:
+                            format = ImageFormat.Png;
+                            break;
+                    }
+
+                    Bitmap resultBmp = GetResultImg();
+                    if (resultBmp != null)
+                    {
+                        resultBmp.Save(saveDialog.FileName, format);
+                        isSucceed = true;
+                    }
+                }
+            }
+            return isSucceed;
+        }
+
+        /// <summary> 将绘制后的选区图片添加选区图片链表，以便实现撤销操作 </summary> 
+        private void AddImgToUpdatedSelectImgList(bool isDrawText)
+        {
+            Image lastSelectImg = GetResultImg();   //上一个图片(最后的图片)
+            if (lastSelectImg != null)
+            {
+                Bitmap lastImg_Copy = new Bitmap(lastSelectImg.Width, lastSelectImg.Height);
+                using (Graphics g = Graphics.FromImage(lastImg_Copy))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.HighQualityBilinear;
+
+                    //绘制上一个图片
+                    g.DrawImage(
+                        lastSelectImg,
+                        new Rectangle(Point.Empty, lastImg_Copy.Size),
+                        new Rectangle(Point.Empty, lastSelectImg.Size),
+                        GraphicsUnit.Pixel);
+
+                    //绘制操作为绘制文本
+                    if (isDrawText)
+                    {
+                        Point textPoint = textBoxString.Location;
+                        textPoint.Offset(-m_selectRect.X, -m_selectRect.Y);
+
+                        using (SolidBrush sbrush = new SolidBrush(textBoxString.ForeColor))
+                        {
+                            g.DrawString(textBoxString.Text.Trim(), textBoxString.Font, sbrush, textPoint);
+                        }
+                    }
+                    else
+                    {
+                        DrawOperateion(g, true);
+                    }
+                }
+
+                m_UpdatedSelectImgList.Add(lastImg_Copy);
+                Invalidate();
+            }
+        }
+
+        #endregion
+
+        #region TextBox
+
+        /// <summary>显示文本框</summary>
+        private void ShowTextBox()
+        {
+            int width = 50;
+            if (m_selectRect.Right - m_startDrawPoint.X > width)
+                textBoxString.Location = m_startDrawPoint;
+            else
+                textBoxString.Location = new Point(m_selectRect.Right - width, m_startDrawPoint.Y);
+
+            textBoxString.Font = new Font(textBoxString.Font.FontFamily, Convert.ToSingle(colorTableWithFont.FontWidth));
+            textBoxString.ForeColor = colorTableWithFont.FontColor;
+            textBoxString.Size = new Size(width, textBoxString.Font.Height);
+            textBoxString.Text = string.Empty;
+            textBoxString.Visible = true;
+            textBoxString.Focus();
+        }
+
+        /// <summary>文本框事件初始化</summary>
+        private void TextBoxEventIni()
+        {
+            textBoxString.TextChanged += new EventHandler(textBoxString_TextChanged);
+            textBoxString.LostFocus += new EventHandler(textBoxString_LostFocus);
+            textBoxString.VisibleChanged += new EventHandler(textBoxString_VisibleChanged);
+        }
+
+        private void textBoxString_VisibleChanged(object sender, EventArgs e)
+        {
+            if (!textBoxString.Visible && textBoxString.Text.Trim().Length != 0)
+                AddImgToUpdatedSelectImgList(true);
+        }
+
+        private void textBoxString_TextChanged(object sender, EventArgs e)
+        {
+            Size size = TextRenderer.MeasureText(textBoxString.Text, textBoxString.Font);
+
+            if (size.Width < 50)
+                size.Width = 50;
+            if (size.Height == 0)
+                size.Height = textBoxString.Font.Height;
+
+            textBoxString.Size = size;
+        }
+
+        private void textBoxString_LostFocus(object sender, EventArgs e)
+        {
+            textBoxString.Visible = false;
+
+            if (textBoxString.Text.Length != 0)
+            {
+                AddImgToUpdatedSelectImgList(true);
+                textBoxString.Text = string.Empty;
+            }
+        }
+
+        #endregion
+
+        #region ToolBar
+
+        /// <summary>显示截图工具栏</summary>
         private void ShowCaptureToolBar()
         {
             bool isGetSelectRect = (m_captureState == CaptureState.FinishedRect ||
@@ -967,6 +1104,7 @@ namespace NScreenCapture.CaptureForm
             }
         }
 
+        /// <summary>设置截图工具栏位置</summary>
         private void SetToolBarLocation()
         {
             Point location = Point.Empty;
@@ -1029,182 +1167,7 @@ namespace NScreenCapture.CaptureForm
             captureToolBar.Location = location;
         }
 
-        private void ShowTextBox()
-        {
-            int width = 50;
-            if (m_selectRect.Right - m_startDrawPoint.X > width)
-                textBoxString.Location = m_startDrawPoint;
-            else
-                textBoxString.Location = new Point(m_selectRect.Right - width, m_startDrawPoint.Y);
-
-            textBoxString.Font = new Font(textBoxString.Font.FontFamily, Convert.ToSingle(colorTableWithFont.FontWidth));
-            textBoxString.ForeColor = colorTableWithFont.FontColor;
-            textBoxString.Size = new Size(width, textBoxString.Font.Height);
-            textBoxString.Text = string.Empty;
-            textBoxString.Visible = true;
-            textBoxString.Focus();
-        }
-
-
-        private Bitmap GetBaseSelectImg()
-        {
-            if (m_selectRect.Size != Size.Empty)
-            {
-                Bitmap baseSelectImg = new Bitmap(m_selectRect.Width, m_selectRect.Height);
-                Graphics g = Graphics.FromImage(baseSelectImg);
-                g.DrawImage(
-                    m_screenImg,
-                    new Rectangle(Point.Empty, baseSelectImg.Size),
-                    m_selectRect,
-                    GraphicsUnit.Pixel);
-
-                return baseSelectImg;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private Bitmap GetResultImg()
-        {
-            if (m_UpdatedSelectImgList.Count == 0)
-            {
-                return GetBaseSelectImg();
-            }
-            else
-            {
-                return m_UpdatedSelectImgList[m_UpdatedSelectImgList.Count - 1];
-            }
-        }
-
-        private bool SaveResultImg()
-        {
-            bool isSucceed = false;
-            using (SaveFileDialog saveDialog = new SaveFileDialog())
-            {
-                saveDialog.InitialDirectory = m_resultImgDefaultSavePath;
-                saveDialog.FileName = m_resultImgFileName;
-                saveDialog.AddExtension = true;
-                saveDialog.Filter = "BMP|*.bmp|PNG|*.png|GIF|*.gif|JPEG|*.jpg;*.jgeg";
-                saveDialog.DefaultExt = "png";
-                saveDialog.FilterIndex = 2;
-
-                if (saveDialog.ShowDialog() == DialogResult.OK)
-                {
-                    int length = saveDialog.FileName.Length;
-                    string extion = saveDialog.FileName.Substring(length - 3, 3).ToLower();
-                    ImageFormat format;
-                    switch (extion)
-                    {
-                        case "bmp":
-                            format = ImageFormat.Bmp;
-                            break;
-                        case "png":
-                            format = ImageFormat.Png;
-                            break;
-                        case "gif":
-                            format = ImageFormat.Gif;
-                            break;
-                        case "jpg":
-                            format = ImageFormat.Jpeg;
-                            break;
-                        default:
-                            format = ImageFormat.Png;
-                            break;
-                    }
-
-                    Bitmap resultBmp = GetResultImg();
-                    if (resultBmp != null)
-                    {
-                        resultBmp.Save(saveDialog.FileName, format);
-                        isSucceed = true;
-                    }
-                }
-            }
-            return isSucceed;
-        }
-
-        // 将绘制后的选区图片添加选区图片链表，以便实现撤销操作
-        private void AddImgToUpdatedSelectImgList(bool isDrawText)
-        {
-            Image lastSelectImg = GetResultImg();   //上一个图片(最后的图片)
-            if (lastSelectImg != null)
-            {
-                Bitmap lastImg_Copy = new Bitmap(lastSelectImg.Width, lastSelectImg.Height);
-                using (Graphics g = Graphics.FromImage(lastImg_Copy))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.HighQualityBilinear;
-
-                    //绘制上一个图片
-                    g.DrawImage(
-                        lastSelectImg,
-                        new Rectangle(Point.Empty, lastImg_Copy.Size),
-                        new Rectangle(Point.Empty, lastSelectImg.Size),
-                        GraphicsUnit.Pixel);
-
-                    //绘制操作为绘制文本
-                    if (isDrawText)
-                    {
-                        Point textPoint = textBoxString.Location;
-                        textPoint.Offset(-m_selectRect.X, -m_selectRect.Y);
-
-                        using (SolidBrush sbrush = new SolidBrush(textBoxString.ForeColor))
-                        {
-                            g.DrawString(textBoxString.Text.Trim(), textBoxString.Font, sbrush, textPoint);
-                        }
-                    }
-                    else
-                    {
-                        DrawOperateion(g, true);
-                    }
-                }
-
-                m_UpdatedSelectImgList.Add(lastImg_Copy);
-                Invalidate();
-            }
-        }
-
-
-        private void TextBoxEventIni()
-        {
-            textBoxString.TextChanged += new EventHandler(textBoxString_TextChanged);
-            textBoxString.LostFocus += new EventHandler(textBoxString_LostFocus);
-            textBoxString.VisibleChanged += new EventHandler(textBoxString_VisibleChanged);
-        }
-
-        private void textBoxString_VisibleChanged(object sender, EventArgs e)
-        {
-            if (!textBoxString.Visible && textBoxString.Text.Trim().Length != 0)
-                AddImgToUpdatedSelectImgList(true);
-        }
-
-        private void textBoxString_TextChanged(object sender, EventArgs e)
-        {
-            Size size = TextRenderer.MeasureText(textBoxString.Text, textBoxString.Font);
-
-            if (size.Width < 50)
-                size.Width = 50;
-            if (size.Height == 0)
-                size.Height = textBoxString.Font.Height;
-
-            textBoxString.Size = size;
-        }
-
-        private void textBoxString_LostFocus(object sender, EventArgs e)
-        {
-            textBoxString.Visible = false;
-
-            if (textBoxString.Text.Length != 0)
-            {
-                AddImgToUpdatedSelectImgList(true);
-                textBoxString.Text = string.Empty;
-            }
-        }
-
-
-        // 避免当显示ColorTable等控件时其可见部分超过屏幕最底端 
+        /// <summary>避免当显示ColorTable等控件时其可见部分超过屏幕最底端 </summary> 
         private void UpdateToolBarLocation()
         {
             int yoffset_ToolBar_SelectRect = 5;         //ToolBar 与选区的垂直距离
@@ -1350,23 +1313,24 @@ namespace NScreenCapture.CaptureForm
             colorTableWithWidth.Visible = false;
         }
 
-        private void ToolBarEventsIni()
+        /// <summary>截图工具栏事件初始化</summary>
+        private void ToolBarEventIni()
         {
-            captureToolBar.RectangleTool.Click += new EventHandler(RectangleTool_Click);
-            captureToolBar.EllipseTool.Click += new EventHandler(EllipseTool_Click);
-            captureToolBar.ArrowTool.Click += new EventHandler(ArrowTool_Click);
-            captureToolBar.BrushTool.Click += new EventHandler(BrushTool_Click);
-            captureToolBar.TextTool.Click += new EventHandler(TextTool_Click);
-            captureToolBar.UndoTool.Click += new EventHandler(UndoTool_Click);
-            captureToolBar.SaveTool.Click += new EventHandler(SaveTool_Click);
-            captureToolBar.LoadImgToMSpaintTool.Click += new EventHandler(LoadImgToMSpaintTool_Click);
-            captureToolBar.ExitCaptureTool.Click += new EventHandler(ExitCaptureTool_Click);
-            captureToolBar.FinishCaptureTool.Click += new EventHandler(FinishCaptureTool_Click);
+            captureToolBar.OnRectangleToolClick+= new EventHandler(RectangleTool_Click);
+            captureToolBar.OnEllipseToolClick += new EventHandler(EllipseTool_Click);
+            captureToolBar.OnArrowToolClick += new EventHandler(ArrowTool_Click);
+            captureToolBar.OnBrushToolClick += new EventHandler(BrushTool_Click);
+            captureToolBar.OnTextToolClick+= new EventHandler(TextTool_Click);
+            captureToolBar.OnUndoToolClick+= new EventHandler(UndoTool_Click);
+            captureToolBar.OnSaveToolClick += new EventHandler(SaveTool_Click);
+            captureToolBar.OnLoadImgToMSpaintToolClick += new EventHandler(LoadImgToMSpaintTool_Click);
+            captureToolBar.OnExitCaptureToolClick += new EventHandler(ExitCaptureTool_Click);
+            captureToolBar.OnFinishCaptureToolClick += new EventHandler(FinishCaptureTool_Click);
         }
 
         private void RectangleTool_Click(object sender, EventArgs e)
         {
-            if (captureToolBar.RectangleTool.IsDown)    //绘制矩形按钮处于未按下状态m
+            if (captureToolBar.IsRectangleToolDown)    //绘制矩形按钮处于未按下状态m
             {
                 m_captureState = CaptureState.DrawInRect;
                 m_drawStyle = DrawStyle.Rectangle;
@@ -1383,7 +1347,7 @@ namespace NScreenCapture.CaptureForm
 
         private void EllipseTool_Click(object sender, EventArgs e)
         {
-            if (captureToolBar.EllipseTool.IsDown)
+            if (captureToolBar.IsEllipseToolDown)
             {
                 m_captureState = CaptureState.DrawInRect;
                 m_drawStyle = DrawStyle.Ellipse;
@@ -1400,7 +1364,7 @@ namespace NScreenCapture.CaptureForm
 
         private void ArrowTool_Click(object sender, EventArgs e)
         {
-            if (captureToolBar.ArrowTool.IsDown)
+            if (captureToolBar.IsArrowToolDown)
             {
                 m_captureState = CaptureState.DrawInRect;
                 m_drawStyle = DrawStyle.Arrow;
@@ -1417,7 +1381,7 @@ namespace NScreenCapture.CaptureForm
 
         private void BrushTool_Click(object sender, EventArgs e)
         {
-            if (captureToolBar.BrushTool.IsDown)
+            if (captureToolBar.IsBrushToolDown)
             {
                 m_captureState = CaptureState.DrawInRect;
                 m_drawStyle = DrawStyle.Brush;
@@ -1434,7 +1398,7 @@ namespace NScreenCapture.CaptureForm
 
         private void TextTool_Click(object sender, EventArgs e)
         {
-            if (captureToolBar.TextTool.IsDown)
+            if (captureToolBar.IsTextToolDown)
             {
                 m_captureState = CaptureState.DrawInRect;
                 m_drawStyle = DrawStyle.Text;
