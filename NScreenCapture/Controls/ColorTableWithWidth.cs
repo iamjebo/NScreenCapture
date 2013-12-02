@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using ScreenCapture.Helpers;
-using ScreenCapture.Types;
+using NScreenCapture.Helpers;
+using NScreenCapture.Types;
 
-namespace ScreenCapture.Controls
+namespace NScreenCapture.Controls
 {
     /****************************************************************
     * 

@@ -1,4 +1,4 @@
-﻿namespace ScreenCapture.Controls
+﻿namespace NScreenCapture.Controls
 {
     partial class ColorTableWithFont
     {
@@ -31,8 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColorTableWithFont));
             this.pictureBoxFont = new System.Windows.Forms.PictureBox();
             this.comboBoxFontWidth = new System.Windows.Forms.ComboBox();
-            this.separator1 = new ScreenCapture.Controls.Separator();
-            this.colorTable = new ScreenCapture.Controls.ColorTable();
+            this.separator1 = new NScreenCapture.Controls.Separator();
+            this.colorTable = new NScreenCapture.Controls.ColorTable();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFont)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.separator1)).BeginInit();
             this.SuspendLayout();

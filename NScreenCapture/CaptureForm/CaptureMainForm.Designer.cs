@@ -1,4 +1,4 @@
-﻿namespace ScreenCapture
+﻿namespace NScreenCapture.CaptureForm
 {
     partial class CaptureMainForm
     {
@@ -12,9 +12,9 @@
         private void InitializeComponent()
         {
             this.textBoxString = new System.Windows.Forms.TextBox();
-            this.captureToolBar = new ScreenCapture.Controls.CaptureToolBar();
-            this.colorTableWithWidth = new ScreenCapture.Controls.ColorTableWithWidth();
-            this.colorTableWithFont = new ScreenCapture.Controls.ColorTableWithFont();
+            this.captureToolBar = new NScreenCapture.Controls.CaptureToolBar();
+            this.colorTableWithWidth = new NScreenCapture.Controls.ColorTableWithWidth();
+            this.colorTableWithFont = new NScreenCapture.Controls.ColorTableWithFont();
             ((System.ComponentModel.ISupportInitialize)(this.captureToolBar)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,7 +63,6 @@
             this.Controls.Add(this.textBoxString);
             this.Controls.Add(this.colorTableWithWidth);
             this.Controls.Add(this.colorTableWithFont);
-            this.KeyPreview = true;
             this.Name = "CaptureMainForm";
             this.Text = "C#截图程序";
             ((System.ComponentModel.ISupportInitialize)(this.captureToolBar)).EndInit();
@@ -74,9 +73,9 @@
 
         #endregion
 
-        private ScreenCapture.Controls.ColorTableWithFont colorTableWithFont;
-        private ScreenCapture.Controls.ColorTableWithWidth colorTableWithWidth;
+        private NScreenCapture.Controls.ColorTableWithFont colorTableWithFont;
+        private NScreenCapture.Controls.ColorTableWithWidth colorTableWithWidth;
         private System.Windows.Forms.TextBox textBoxString;
-        private ScreenCapture.Controls.CaptureToolBar captureToolBar;
+        private NScreenCapture.Controls.CaptureToolBar captureToolBar;
     }
 }

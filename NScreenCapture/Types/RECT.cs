@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Drawing;
 
-namespace ScreenCapture.Types
+namespace NScreenCapture.Types
 {
     /****************************************************************
     * 

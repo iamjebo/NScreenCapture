@@ -6,9 +6,9 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-using ScreenCapture.Types;
+using NScreenCapture.Types;
 
-namespace ScreenCapture.Controls
+namespace NScreenCapture.Controls
 {
     /****************************************************************
     * 

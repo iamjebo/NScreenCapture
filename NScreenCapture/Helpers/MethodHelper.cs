@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace ScreenCapture.Helpers
+namespace NScreenCapture.Helpers
 {
 
     /****************************************************************

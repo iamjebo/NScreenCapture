@@ -7,9 +7,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 
-using ScreenCapture.Helpers;
+using NScreenCapture.Helpers;
 
-namespace ScreenCapture.Controls
+namespace NScreenCapture.Controls
 {
     /****************************************************************
     * 

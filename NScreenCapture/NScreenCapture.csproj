@@ -8,7 +8,7 @@
     <ProjectGuid>{59F4B4AC-562F-4C22-AE7F-25F6CB688432}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ScreenCapture</RootNamespace>
+    <RootNamespace>NScreenCapture</RootNamespace>
     <AssemblyName>ScreenShot</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -49,20 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CaptureForm\DrawArgsManager.cs" />
+    <Compile Include="Helpers\HotKey.cs" />
     <Compile Include="Helpers\MethodHelper.cs" />
     <Compile Include="Helpers\Win32.cs" />
-    <Compile Include="Capture\Capture.cs" />
-    <Compile Include="Capture\CaptureMainForm.cs">
+    <Compile Include="Capture.cs" />
+    <Compile Include="CaptureForm\CaptureMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Capture\CaptureMainForm.Designer.cs">
+    <Compile Include="CaptureForm\CaptureMainForm.Designer.cs">
       <DependentUpon>CaptureMainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Capture\Demo.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Capture\Demo.Designer.cs">
-      <DependentUpon>Demo.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\ColorButton.cs">
       <SubType>Component</SubType>
@@ -91,6 +87,7 @@
     <Compile Include="Controls\WidthDotButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Types\MouseOperateFlag.cs" />
     <Compile Include="Types\MyControlState.cs" />
     <Compile Include="Controls\CaptureToolBar.cs">
       <SubType>Component</SubType>
@@ -100,14 +97,13 @@
     <Compile Include="Types\MyControlColors.cs" />
     <Compile Include="Types\RECT.cs" />
     <Compile Include="Types\CaptureState.cs" />
-    <Compile Include="Capture\Program.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Types\ToolBarLocationFlag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Capture\CaptureMainForm.resx">
+    <Compile Include="Types\WindowInfo.cs" />
+    <Compile Include="CaptureForm\WindowsListManager.cs" />
+    <EmbeddedResource Include="CaptureForm\CaptureMainForm.resx">
       <DependentUpon>CaptureMainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Capture\Demo.resx">
-      <DependentUpon>Demo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ColorTableWithFont.resx">
       <DependentUpon>ColorTableWithFont.cs</DependentUpon>
@@ -136,9 +132,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\cursor_default.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Separator.png" />
     <None Include="Resources\Undo.png" />
     <None Include="Resources\Text.png" />
@@ -153,6 +146,7 @@
     <None Include="Resources\Dot.png" />
     <None Include="Resources\Glassbtn_down.png" />
     <None Include="Resources\Glassbtn_hot.png" />
+    <None Include="Resources\cursor_default.ico" />
     <Content Include="Resources\NScreenCapture.ico" />
   </ItemGroup>
   <ItemGroup />

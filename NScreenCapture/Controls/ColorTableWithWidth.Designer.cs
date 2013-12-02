@@ -1,4 +1,4 @@
-﻿namespace ScreenCapture.Controls
+﻿namespace NScreenCapture.Controls
 {
     partial class ColorTableWithWidth
     {
@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.separator1 = new ScreenCapture.Controls.Separator();
-            this.widthDotBtnMax = new ScreenCapture.Controls.WidthDotButton();
-            this.widthDotBtnMeduim = new ScreenCapture.Controls.WidthDotButton();
-            this.widthDotBtnMin = new ScreenCapture.Controls.WidthDotButton();
-            this.colorTable = new ScreenCapture.Controls.ColorTable();
+            this.separator1 = new NScreenCapture.Controls.Separator();
+            this.widthDotBtnMax = new NScreenCapture.Controls.WidthDotButton();
+            this.widthDotBtnMeduim = new NScreenCapture.Controls.WidthDotButton();
+            this.widthDotBtnMin = new NScreenCapture.Controls.WidthDotButton();
+            this.colorTable = new NScreenCapture.Controls.ColorTable();
             ((System.ComponentModel.ISupportInitialize)(this.separator1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -48,7 +48,7 @@
             // 
             this.widthDotBtnMax.AutoSize = true;
             this.widthDotBtnMax.BackColor = System.Drawing.Color.Transparent;
-            this.widthDotBtnMax.DotWidth = ScreenCapture.Types.DotWidth.Maximize;
+            this.widthDotBtnMax.DotWidth = NScreenCapture.Types.DotWidth.Maximize;
             this.widthDotBtnMax.Location = new System.Drawing.Point(74, 9);
             this.widthDotBtnMax.MinimumSize = new System.Drawing.Size(23, 23);
             this.widthDotBtnMax.Name = "widthDotBtnMax";
@@ -60,7 +60,7 @@
             // 
             this.widthDotBtnMeduim.AutoSize = true;
             this.widthDotBtnMeduim.BackColor = System.Drawing.Color.Transparent;
-            this.widthDotBtnMeduim.DotWidth = ScreenCapture.Types.DotWidth.Medium;
+            this.widthDotBtnMeduim.DotWidth = NScreenCapture.Types.DotWidth.Medium;
             this.widthDotBtnMeduim.Location = new System.Drawing.Point(41, 9);
             this.widthDotBtnMeduim.MinimumSize = new System.Drawing.Size(23, 23);
             this.widthDotBtnMeduim.Name = "widthDotBtnMeduim";
@@ -73,7 +73,7 @@
             this.widthDotBtnMin.AutoSize = true;
             this.widthDotBtnMin.BackColor = System.Drawing.Color.Transparent;
             this.widthDotBtnMin.Checked = true;
-            this.widthDotBtnMin.DotWidth = ScreenCapture.Types.DotWidth.Minimize;
+            this.widthDotBtnMin.DotWidth = NScreenCapture.Types.DotWidth.Minimize;
             this.widthDotBtnMin.Location = new System.Drawing.Point(8, 9);
             this.widthDotBtnMin.MinimumSize = new System.Drawing.Size(23, 23);
             this.widthDotBtnMin.Name = "widthDotBtnMin";

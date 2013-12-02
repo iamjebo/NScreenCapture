@@ -6,10 +6,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using ScreenCapture.Types;
-using ScreenCapture.Helpers;
+using NScreenCapture.Types;
+using NScreenCapture.Helpers;
 
-namespace ScreenCapture.Controls
+namespace NScreenCapture.Controls
 {
     /****************************************************************
     * 
@@ -136,7 +136,7 @@ namespace ScreenCapture.Controls
             this.m_finishCaptureTool.Size = new System.Drawing.Size(67, 24);
             this.m_finishCaptureTool.TabIndex = 9;
             this.m_finishCaptureTool.TabStop = false;
-            this.m_finishCaptureTool.ToolTipText = "退出截图";
+            this.m_finishCaptureTool.ToolTipText = "复制到剪切板";
             this.m_finishCaptureTool.Image = Properties.Resources.Finish;
             this.m_finishCaptureTool.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.m_finishCaptureTool.Text = "完成";
@@ -151,7 +151,7 @@ namespace ScreenCapture.Controls
             this.m_exitCaptureTool.Size = new System.Drawing.Size(24, 24);
             this.m_exitCaptureTool.TabIndex = 8;
             this.m_exitCaptureTool.TabStop = false;
-            this.m_exitCaptureTool.ToolTipText = "复制到剪切板";
+            this.m_exitCaptureTool.ToolTipText = "退出截图";
             this.m_exitCaptureTool.Image = Properties.Resources.Exit;
             // 
             // separatorRight
@@ -183,7 +183,7 @@ namespace ScreenCapture.Controls
             this.m_saveTool.Size = new System.Drawing.Size(24, 24);
             this.m_saveTool.TabIndex = 6;
             this.m_saveTool.TabStop = false;
-            this.m_saveTool.ToolTipText = "保存";
+            this.m_saveTool.ToolTipText = "保存 Ctrl + S";
             this.m_saveTool.Image = Properties.Resources.Save;
             // 
             // undoTool
@@ -195,7 +195,7 @@ namespace ScreenCapture.Controls
             this.m_undoTool.Size = new System.Drawing.Size(24, 24);
             this.m_undoTool.TabIndex = 5;
             this.m_undoTool.TabStop = false;
-            this.m_undoTool.ToolTipText = "撤销编辑";
+            this.m_undoTool.ToolTipText = "撤销 Ctrl + Z";
             this.m_undoTool.Image = Properties.Resources.Undo;
             // 
             // separatorLeft
