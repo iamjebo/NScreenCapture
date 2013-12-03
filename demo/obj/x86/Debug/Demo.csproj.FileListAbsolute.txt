@@ -1,0 +1,11 @@
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\bin\Debug\Demo.exe
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\bin\Debug\Demo.pdb
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\bin\Debug\NScreenCapture.dll
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\bin\Debug\NScreenCapture.xml
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\obj\x86\Debug\Demo.DemoForm.resources
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\obj\x86\Debug\Demo.Properties.Resources.resources
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\obj\x86\Debug\Demo.exe
+C:\Users\ThinkPad\Desktop\NScreenCapture\demo\obj\x86\Debug\Demo.pdb

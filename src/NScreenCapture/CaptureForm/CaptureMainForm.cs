@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region Apache License
+//
+// Licensed to the Apache Software Foundation (ASF) under one or more 
+// contributor license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership. 
+// The ASF licenses this file to you under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with 
+// the License. You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,18 +38,6 @@ using NScreenCapture.Helpers;
 
 namespace NScreenCapture.CaptureForm
 {
-
-    /****************************************************************
-    * 
-    *             Dcrp：CaptureScreen 截图主窗体
-    *           Author：曹江波
-    *             Blog: http://www.cnblogs.com/Keep-Silence-/
-    *           E-mail: caojiangbocn@gmail.com
-    *           Update: 2013-12-2
-    *
-    *****************************************************************/
-
-
     /// <summary>
     ///  截图主窗体
     /// </summary>
@@ -820,7 +827,7 @@ namespace NScreenCapture.CaptureForm
                 case MouseEditFlag.Defalut:
                     break;
             }
-            m_editExRect = m_selectRect;
+            
             this.Invalidate();
         }
 
@@ -864,8 +871,11 @@ namespace NScreenCapture.CaptureForm
             // Shift + Up 向上拉伸
             HotkeyEventHandler upSizeHandler = delegate()
             {
-                if (m_selectRect.Y > 0)  //上边界禁止调整大小
+                if (m_selectRect.Y > 0)
+                {
                     EditSelectRect(MouseEditFlag.North, m_selectRect.X, m_selectRect.Y - 1);
+                    m_editExRect = m_selectRect;
+                }
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Up, upSizeHandler);
 
@@ -873,7 +883,10 @@ namespace NScreenCapture.CaptureForm
             HotkeyEventHandler downSizeHandler = delegate()
             {
                 if (m_selectRect.Bottom < Height)
+                {
                     EditSelectRect(MouseEditFlag.South, m_selectRect.X, m_selectRect.Bottom + 1);
+                    m_editExRect = m_selectRect;
+                }
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Down, downSizeHandler);
 
@@ -881,7 +894,10 @@ namespace NScreenCapture.CaptureForm
             HotkeyEventHandler leftSizeHandler = delegate()
             {
                 if (m_selectRect.X > 0)
+                {
                     EditSelectRect(MouseEditFlag.West, m_selectRect.X - 1, m_selectRect.Y);
+                    m_editExRect = m_selectRect;
+                }
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Left, leftSizeHandler);
 
@@ -889,7 +905,10 @@ namespace NScreenCapture.CaptureForm
             HotkeyEventHandler rightSizeHandler = delegate()
             {
                 if (m_selectRect.Right < Width)
+                {
                     EditSelectRect(MouseEditFlag.East, m_selectRect.Right + 1, m_selectRect.Y);
+                    m_editExRect = m_selectRect;
+                }
             };
             m_hotkey.RegisterHotKeys(HotKey.ModiferFlag.Shift, Keys.Right, rightSizeHandler);
         }
@@ -979,6 +998,7 @@ namespace NScreenCapture.CaptureForm
                     }
                 }
             }
+            captureToolBar.Reset();
             return isSucceed;
         }
 

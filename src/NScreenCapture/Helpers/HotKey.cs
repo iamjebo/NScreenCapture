@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region Apache License
+//
+// Licensed to the Apache Software Foundation (ASF) under one or more 
+// contributor license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership. 
+// The ASF licenses this file to you under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with 
+// the License. You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,25 +27,13 @@ using System.Collections;
 
 namespace NScreenCapture.Helpers
 {
-
-    /****************************************************************
-    * 
-    *             Dcrp：系统热键注册帮助类
-    *           Author：曹江波
-    *             Blog: http://www.cnblogs.com/Keep-Silence-/
-    *           E-mail: caojiangbocn@gmail.com
-    *           Update: 2013-11-30
-    *
-    *****************************************************************/
-
-
     /// <summary>热键事件处理方法代理</summary>
-    public delegate void HotkeyEventHandler();
+    internal delegate void HotkeyEventHandler();
 
     /// <summary>
     /// 注册系统全局热键辅助类
     /// </summary>
-    public class HotKey : IMessageFilter, IDisposable
+    internal class HotKey : IMessageFilter, IDisposable
     {
         #region HotKey
 
@@ -164,6 +171,9 @@ namespace NScreenCapture.Helpers
 
         #region ModiferFlag
 
+        /// <summary>
+        /// 快捷键组合系统键
+        /// </summary>
         [Flags]
         public enum ModiferFlag
         {
@@ -187,21 +197,21 @@ namespace NScreenCapture.Helpers
 
         #region Win32
 
-        public const int WM_HOTKEY = 0x312;
+        private const int WM_HOTKEY = 0x312;
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern ushort GlobalAddAtom(string lpString);
+        private static extern ushort GlobalAddAtom(string lpString);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
-        public static extern ushort GlobalDeleteAtom(ushort nAtom);
+        private static extern ushort GlobalDeleteAtom(ushort nAtom);
 
         #endregion
     }

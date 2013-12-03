@@ -1,0 +1,666 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NScreenCapture</name>
+    </assembly>
+    <members>
+        <member name="T:NScreenCapture.Controls.WidthDotButton">
+            <summary>
+            宽度点控件
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.WidthDotButton.DotWidth">
+            <summary>
+            宽度点控件的宽度
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Controls.CaptureToolBar">
+            <summary>
+            截图工具栏控件
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Controls.CaptureToolBar.Reset">
+            <summary>
+            重置所有工具按钮的状态
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsRectangleToolDown">
+            <summary>矩形工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsEllipseToolDown">
+            <summary>椭圆工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsArrowToolDown">
+            <summary>箭头工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsBrushToolDown">
+            <summary>画刷工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsTextToolDown">
+            <summary>文字工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsUndoToolDown">
+            <summary>撤销工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsSaveToolDown">
+            <summary>保存工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsLoadImgToMSpaintToolDown">
+            <summary>导入图片到画图中工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsExitCaptureToolDown">
+            <summary>退出截图工具是否被按下</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.CaptureToolBar.IsFinishCaptureToolDown">
+            <summary>完成截图工具是否被按下</summary>
+        </member>
+        <member name="T:NScreenCapture.Types.MyControlColors">
+            <summary>
+            自定义控件绘制所用的颜色类
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MyControlColors.BORDER_COLOR">
+            <summary>
+            自定义控件边框的颜色
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MyControlColors.BACKGROUND_COLOR">
+            <summary>
+            自定义控件背景色
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Helpers.ImageHelper">
+            <summary>
+            图像操作帮助类，封装了常用的方法。
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Helpers.ImageHelper.GetColor(System.Drawing.Image,System.Int32,System.Int32)">
+            <summary>
+            获取图片指定坐标的颜色
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Helpers.ImageHelper.MagnifyImage(System.Drawing.Bitmap,System.Int32)">
+            <summary>
+            将图片按照指定的倍数放大
+            </summary>
+            <param name="bmpSrc">需要放大的图片</param>
+            <param name="times">放到的倍数</param>
+        </member>
+        <member name="M:NScreenCapture.Helpers.ImageHelper.DrawImageWithNineRect(System.Drawing.Graphics,System.Drawing.Image,System.Drawing.Rectangle,System.Drawing.Rectangle)">
+            <summary>
+            利用九宫图绘制图像
+            </summary>
+            <param name="g">绘图对象</param>
+            <param name="img">所需绘制的图片</param>
+            <param name="targetRect">目标矩形</param>
+            <param name="srcRect">来源矩形</param>
+        </member>
+        <member name="T:NScreenCapture.Types.RECT">
+            <summary>
+             Win32平台的RECT矩形结构
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Types.RECT.#ctor(System.Drawing.Point,System.Drawing.Point)">
+            <summary> 从2个点构建RECT.</summary>
+        </member>
+        <member name="M:NScreenCapture.Types.RECT.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary> 从2个点的坐标分量构建RECT</summary>
+        </member>
+        <member name="M:NScreenCapture.Types.RECT.#ctor(System.Drawing.Rectangle)">
+            <summary>从指定的Rectangle构建RECT.</summary>
+        </member>
+        <member name="M:NScreenCapture.Types.RECT.ToRectangle">
+            <summary>将RECT类型的矩形转换为Rectangle矩形。</summary>
+        </member>
+        <member name="P:NScreenCapture.Types.RECT.Size">
+            <summary> 大小 </summary>
+        </member>
+        <member name="T:NScreenCapture.Controls.Separator">
+            <summary>
+            自定义控件分割符 ,用以在截图功能栏中分割工具小按钮
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Helpers.HotkeyEventHandler">
+            <summary>热键事件处理方法代理</summary>
+        </member>
+        <member name="T:NScreenCapture.Helpers.HotKey">
+            <summary>
+            注册系统全局热键辅助类
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Helpers.HotKey.#ctor(System.IntPtr)">
+            <summary>
+            以指定窗体的句柄创建热键辅助类
+            </summary>
+            <param name="hwnd">需要注册热键窗体的句柄</param>
+        </member>
+        <member name="M:NScreenCapture.Helpers.HotKey.RegisterHotKeys(NScreenCapture.Helpers.HotKey.ModiferFlag,System.Windows.Forms.Keys,NScreenCapture.Helpers.HotkeyEventHandler)">
+            <summary>
+             注册系统全局热键
+            </summary>
+            <param name="fsModifers">系统键</param>
+            <param name="key">虚拟键</param>
+            <param name="handler">热键处理函数委托</param>
+            <returns>如果注册成功，则返回热键的全局标识符</returns>
+        </member>
+        <member name="M:NScreenCapture.Helpers.HotKey.UnregisterHotKeys">
+            <summary>卸载窗体的所有热键</summary>
+        </member>
+        <member name="P:NScreenCapture.Helpers.HotKey.Handle">
+            <summary>需要注册热键窗体的句柄</summary>
+        </member>
+        <member name="T:NScreenCapture.Helpers.HotKey.ModiferFlag">
+            <summary>
+            快捷键组合系统键
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Helpers.HotKey.ModiferFlag.None">
+            <summary> 无系统键</summary>
+        </member>
+        <member name="F:NScreenCapture.Helpers.HotKey.ModiferFlag.Alt">
+            <summary> Alt键</summary>
+        </member>
+        <member name="F:NScreenCapture.Helpers.HotKey.ModiferFlag.Ctrl">
+            <summary> Ctrl键 </summary>
+        </member>
+        <member name="F:NScreenCapture.Helpers.HotKey.ModiferFlag.Shift">
+            <summary> Shift键</summary>
+        </member>
+        <member name="F:NScreenCapture.Helpers.HotKey.ModiferFlag.Win">
+            <summary> Windows键</summary>
+        </member>
+        <member name="T:NScreenCapture.Controls.ColorTableWithWidth">
+            <summary>
+            带有宽度点控件的颜色表组合控件
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Controls.ColorTableWithWidth.Reset">
+            <summary>重置控件颜色</summary>
+        </member>
+        <member name="F:NScreenCapture.Controls.ColorTableWithWidth.components">
+            <summary> 
+            必需的设计器变量。
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Controls.ColorTableWithWidth.Dispose(System.Boolean)">
+            <summary> 
+            清理所有正在使用的资源。
+            </summary>
+            <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
+        </member>
+        <member name="M:NScreenCapture.Controls.ColorTableWithWidth.InitializeComponent">
+            <summary> 
+            设计器支持所需的方法 - 不要
+            使用代码编辑器修改此方法的内容。
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.ColorTableWithWidth.LineWidth">
+            <summary>当前用户选择的线条宽度</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.ColorTableWithWidth.LineColor">
+            <summary>当前用户选择的线条颜色</summary>
+        </member>
+        <member name="T:NScreenCapture.Types.DrawStyle">
+            <summary>
+            工具栏绘制类型枚举
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DrawStyle.None">
+            <summary>
+            无任何绘制
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DrawStyle.Rectangle">
+            <summary>
+            绘制矩形
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DrawStyle.Ellipse">
+            <summary>
+            绘制椭圆
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DrawStyle.Arrow">
+            <summary>
+            绘制箭头
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DrawStyle.Brush">
+            <summary>
+            绘制画刷
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DrawStyle.Text">
+            <summary>
+            绘制文字
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Controls.ColorTableWithFont">
+            <summary>
+            带有字体大小选择的颜色表组合控件
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Controls.ColorTableWithFont.components">
+            <summary> 
+            必需的设计器变量。
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Controls.ColorTableWithFont.Dispose(System.Boolean)">
+            <summary> 
+            清理所有正在使用的资源。
+            </summary>
+            <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
+        </member>
+        <member name="M:NScreenCapture.Controls.ColorTableWithFont.InitializeComponent">
+            <summary> 
+            设计器支持所需的方法 - 不要
+            使用代码编辑器修改此方法的内容。
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Controls.ColorTableWithFont.Reset">
+            <summary>重置颜色</summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.ColorTableWithFont.FontWidth">
+            <summary> 当前用户选择的字体宽度 </summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.ColorTableWithFont.FontColor">
+            <summary>当前用户选择的字体颜色</summary>
+        </member>
+        <member name="T:NScreenCapture.Helpers.Win32">
+            <summary>
+            Win32平台的API函数与常量
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.CaptureForm.WindowsListManager">
+            <summary>
+            枚举桌面所有窗体管理器，实现鼠标移动自动选框功能
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.GetWindowsList">
+            <summary>初始化窗体链表,获取所有窗体所在矩形</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.IsNormalWindow(System.IntPtr)">
+            <summary> 是否为正常窗体，过滤掉桌面、不可见等不需要的窗体 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.EnumChildProc(System.IntPtr,System.IntPtr)">
+            <summary> 枚举子窗体回调函数</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.EnumWindowsProc(System.IntPtr,System.IntPtr)">
+            <summary> 枚举所有顶级窗体回调函数</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.GetDesktopHandle">
+            <summary> 获取系统桌面句柄</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.GetParentHandle(System.IntPtr)">
+            <summary>获取给定句柄窗体的父窗体句柄</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.IsParent(NScreenCapture.Types.WindowInfo,NScreenCapture.Types.WindowInfo)">
+            <summary>判断2个窗体是否存在父子关系</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.FilterWindowsList">
+            <summary>对获取到的所有窗体列表进行筛选过滤</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.DoFilter(System.Collections.Generic.List{NScreenCapture.Types.WindowInfo})">
+            <summary>递归筛选过滤</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.GetCursorWindowRect">
+            <summary>获取光标所在的窗体矩形</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.WindowsListManager.GetCursorWindow">
+            <summary>获取光标所在的窗体</summary>
+        </member>
+        <member name="T:NScreenCapture.Types.MyControlState">
+            <summary>
+            自定义控件的状态枚举
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MyControlState.Normal">
+            <summary>
+            正常状态
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MyControlState.Highlight">
+            <summary>
+             /鼠标进入
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MyControlState.Down">
+            <summary>
+            鼠标按下
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Types.WindowInfo">
+            <summary>
+            窗体信息实体类，用于构造窗体列表。
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Types.WindowInfo.Handle">
+            <summary>窗体句柄</summary>
+        </member>
+        <member name="P:NScreenCapture.Types.WindowInfo.Rect">
+            <summary>窗体所在的矩形(RECT结构)</summary>
+        </member>
+        <member name="T:NScreenCapture.Types.CaptureState">
+            <summary>
+            截图当前操作状态枚举
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.CaptureState.None">
+            <summary>
+            无操作
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.CaptureState.CreatingRect">
+            <summary>
+            正在创建新选区
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.CaptureState.FinishedRect">
+            <summary>
+            选区创建完成
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.CaptureState.ResizingRect">
+            <summary>
+            调整选区的大小
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.CaptureState.DrawInRect">
+            <summary>
+            在选区内绘制图形
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Controls.ColorButton">
+            <summary>
+            颜色方块小控件
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.CaptureForm.DrawArgsManager">
+            <summary>
+            截图绘制参数管理类
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.SCREEN_ALPHA">
+            <summary>遮罩层背景Alpha值</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.LINE_WIDTH_AUTO">
+            <summary>自动选框时绘制矩形画笔的宽度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.LINE_WIDTH_CUSTOM">
+            <summary>自定义截图时选区线条宽度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.LINE_NODE_WIDTH">
+            <summary>自定义截图时选区线条结点宽度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.INFO_SELECTRECT_WIDTH">
+            <summary>选区信息信息框宽度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.INFO_SELECTRECT_HEIGHT">
+            <summary>选区信息信息框高度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.INFO_MOVING_ALPHA">
+            <summary>信息框背景Alpha值</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.INFO_MOVING_WIDTH">
+            <summary>鼠标移动信息框宽度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.INFO_MOVING_PIC_HEIGHT">
+            <summary>鼠标移动信息框上半部分：放大图像高度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.INFO_MOVING_STR_HEIGHT">
+            <summary>鼠标移动信息框下半部分：信息字符串高度</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.INFO_MOVING_RANGE">
+            <summary>放大图像离鼠标点的范围</summary>
+        </member>
+        <member name="F:NScreenCapture.CaptureForm.DrawArgsManager.LINE_COLOR_AUTO">
+            <summary>自动选框时绘制矩形画笔的颜色</summary>
+        </member>
+        <member name="T:NScreenCapture.Types.DotWidth">
+            <summary>
+            工具栏宽度点大小枚举
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DotWidth.Minimize">
+            <summary>
+            最小的宽度
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DotWidth.Medium">
+            <summary>
+            中等的宽度
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.DotWidth.Maximize">
+            <summary>
+            最大的宽度
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Controls.GlassButton">
+            <summary>
+            截图工具小按钮控件
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.GlassButton.IsDown">
+            <summary> 按钮是否处于按下状态 </summary>
+        </member>
+        <member name="T:NScreenCapture.Types.ToolBarLocationFlag">
+            <summary>
+            截图工具栏坐标位置标记枚举
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.ToolBarLocationFlag.RightTop_Outer">
+            <summary>
+            位于选区右上角的外部
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.ToolBarLocationFlag.RightTop_Inner">
+            <summary>
+            位于选区右上角的内部
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.ToolBarLocationFlag.RightBottom_Outer">
+            <summary>
+            位于选区右下角的外部
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.ToolBarLocationFlag.LeftBottom_Outer">
+            <summary>
+            位于选区左下角的外部
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.ToolBarLocationFlag.LeftTop_Outer">
+            <summary>
+            位于选区左上角外部
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Types.MouseEditFlag">
+            <summary>
+            鼠标编辑操作枚举：0-7：调整大小  8：移动  9：默认
+            </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.WestNorth">
+            <summary>西北 </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.West">
+            <summary>西 </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.WestSouth">
+            <summary> 西南</summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.South">
+            <summary> 南 </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.EastSouth">
+            <summary> 东南</summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.East">
+            <summary>东 </summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.EastNorth">
+            <summary> 东北</summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.North">
+            <summary> 北</summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.SizeAll">
+            <summary> 移动</summary>
+        </member>
+        <member name="F:NScreenCapture.Types.MouseEditFlag.Defalut">
+            <summary> 默认</summary>
+        </member>
+        <member name="T:NScreenCapture.Controls.ColorTable">
+            <summary>
+            颜色选择表控件
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Controls.ColorTable.SelectColor">
+            <summary>
+            ColorTable中选中的颜色
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.Properties.Resources">
+            <summary>
+              一个强类型的资源类，用于查找本地化的字符串等。
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Properties.Resources.ResourceManager">
+            <summary>
+              返回此类使用的缓存的 ResourceManager 实例。
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.Properties.Resources.Culture">
+            <summary>
+              使用此强类型资源类，为所有资源查找
+              重写当前线程的 CurrentUICulture 属性。
+            </summary>
+        </member>
+        <member name="T:NScreenCapture.CaptureForm.CaptureMainForm">
+            <summary>
+             截图主窗体
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.DrawAutoSelectRect(System.Drawing.Graphics)">
+            <summary>绘制自动选框矩形</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.DrawCustomeSelectRect(System.Drawing.Graphics)">
+            <summary>绘制自定义选区矩形</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.DrawSelectRectBorder(System.Drawing.Graphics)">
+            <summary>绘制自定义选区矩形边框与结点</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.DrawSelectRectInfo(System.Drawing.Graphics)">
+            <summary>绘制选区矩形左上角的选区大小信息框</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.DrawMouseMoveInfo(System.Drawing.Graphics)">
+            <summary>绘制鼠标右下方的移动信息框</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.DrawOperateion(System.Drawing.Graphics,System.Boolean)">
+            <summary>绘制矩形、画刷等操作</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.FieldAndFormIni">
+            <summary>字段与窗体属性初始化</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.ClearScreen">
+            <summary>清除所有的屏幕截图操作，还原最开始的状态 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.GetOriginalScreenImg">
+            <summary>获取不带遮罩层的屏幕截图</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.GetScreenImgWithMask">
+            <summary>获取带有遮罩层的屏幕截图</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.GetRectNodes(System.Drawing.Rectangle)">
+            <summary>获取指定矩形的8个控制节点</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.GetMouseEditFlag(System.Drawing.Point)">
+            <summary>根据鼠标的位置获取鼠标编辑标记</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.SetCursor">
+            <summary>设置窗体的鼠标图像</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.MoveSelectRect(System.Int32,System.Int32)">
+            <summary> 根据偏移量移动选区 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.EditSelectRect(NScreenCapture.Types.MouseEditFlag,System.Int32,System.Int32)">
+            <summary> 根据鼠标编辑标记对选区进行编辑 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.RegisterHotkeys">
+            <summary> 注册系统热键 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.UnregisterHotkeys">
+            <summary> 卸载已经注册的系统热键 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.GetBaseSelectImg">
+            <summary> 获取屏幕原始选区截图</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.GetResultImg">
+            <summary> 获取最终结果截图</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.SaveResultImg">
+            <summary> 保存截图</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.AddImgToUpdatedSelectImgList(System.Boolean)">
+            <summary> 将绘制后的选区图片添加选区图片链表，以便实现撤销操作 </summary> 
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.ShowTextBox">
+            <summary>显示文本框</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.TextBoxEventIni">
+            <summary>文本框事件初始化</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.ShowCaptureToolBar">
+            <summary>显示截图工具栏</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.SetToolBarLocation">
+            <summary>设置截图工具栏位置</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.UpdateToolBarLocation">
+            <summary>避免当显示ColorTable等控件时其可见部分超过屏幕最底端 </summary> 
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.ToolBarEventIni">
+            <summary>截图工具栏事件初始化</summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.ResetCapture">
+            <summary> 重置截图初始状态 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.ResetWindowsList">
+            <summary> 重新获取桌面所有窗体枚举列表 </summary>
+        </member>
+        <member name="M:NScreenCapture.CaptureForm.CaptureMainForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="P:NScreenCapture.CaptureForm.CaptureMainForm.ImageSaveInitialDirectory">
+            <summary>截图文件保存的默认目录</summary>
+        </member>
+        <member name="P:NScreenCapture.CaptureForm.CaptureMainForm.ImageSaveFilename">
+            <summary>截图文件名</summary>
+        </member>
+        <member name="P:NScreenCapture.CaptureForm.CaptureMainForm.LineColor">
+            <summary>截图过程中选框矩形的颜色</summary>
+        </member>
+        <member name="T:NScreenCapture.Capture">
+            <summary>
+            截图操作类
+            </summary>
+        </member>
+        <member name="M:NScreenCapture.Capture.BeginCaputre">
+            <summary>开始截图</summary>
+        </member>
+        <member name="M:NScreenCapture.Capture.EndCapture">
+            <summary>结束截图</summary>
+        </member>
+        <member name="P:NScreenCapture.Capture.ImageSaveInitialDirectory">
+            <summary>截图文件保存的默认目录</summary>
+        </member>
+        <member name="P:NScreenCapture.Capture.ImageSaveFilename">
+            <summary>截图文件名</summary>
+        </member>
+        <member name="P:NScreenCapture.Capture.LineColor">
+            <summary>截图过程中选框矩形的颜色</summary>
+        </member>
+    </members>
+</doc>
